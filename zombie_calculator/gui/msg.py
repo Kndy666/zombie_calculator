@@ -65,4 +65,4 @@ class Ui_msgWindow(object):
         _translate = QtCore.QCoreApplication.translate
         msgWindow.setWindowTitle(_translate("msgWindow", "正在计算中..."))
         self.return_btn.setText(_translate("msgWindow", "返回"))
-        self.copy_btn.setText(_translate("msgWindow", "复制种子"))
+        self.copy_btn.setText(_translate("msgWindow", "复制"))

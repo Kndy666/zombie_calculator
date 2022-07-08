@@ -97,7 +97,7 @@
           </size>
          </property>
          <property name="text">
-          <string>复制种子</string>
+          <string>复制</string>
          </property>
         </widget>
        </item>
