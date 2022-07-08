@@ -59,7 +59,7 @@ class waveRequire:
         return self.level_beginning == other.level_beginning and self.level_ending == other.level_ending and self.idNeeded == other.idNeeded and self.idRefused == other.idRefused
 
 class calculator:
-    #工具类&初始化
+    #工具方法&初始化
     def __init__(self):
         extra = {'density_scale': '-1'}
         self.sceneName = {
@@ -162,18 +162,19 @@ class calculator:
             QMessageBox.critical(self.mode1W, "错误", "出现意外的异常！")
         else:
             try:
-                rst = ""
+                self.result = ""
                 for lvl in range(level_beginning, level_ending):
                     zombies = seedFinder.appear(uid, mode, self.scene, lvl, seed)
-                    rst += "%d旗到%d旗的出怪为：" % (lvl * 2 + 1, lvl * 2 + 2)
+                    self.result += f"{lvl * 2 + 1}旗到{lvl * 2 + 2}旗的出怪为："
                     amount = 0
                     for i in range(len(zombies)):
                         if zombies[i]:
                             amount += 1
-                            rst += self.typeName.inverse[i] + " "
-                    rst += "共%d种\n\n" % amount
-                pyperclip.copy(rst)
-                QMessageBox.information(self.mode1W, "计算结果", rst)
+                            self.result += self.typeName.inverse[i] + " "
+                    self.result += f"共{amount}种\n\n"
+                self.msgWindowInit()
+                self.msgUpdate(self.result)
+                self.msgW.setWindowTitle("计算完成")
             except:
                 QMessageBox.critical(self.mode1W, "错误", "出现意外的异常！")
 
@@ -242,12 +243,11 @@ class calculator:
             self.calcDone = True
     def seedLogger(self):
         while self.calcDone == False and self.finder.overflow == False:
-            self.store.textUpdate.emit("正在计算，请稍候……\n当前已检索至种子0x%x" % (
-                self.finder.seed))
+            self.store.textUpdate.emit(f"正在计算，请稍候……\n当前已检索至种子0x{self.finder.seed:x}")
             time.sleep(0.2)
         if not self.finder.overflow:
-            pyperclip.copy(self.result)
-            self.store.textUpdate.emit("出怪满足要求的种子为：%x" % (self.result))           
+            self.store.textUpdate.emit(f"出怪满足要求的种子为：0x{self.result:x}")
+            self.msgW.setWindowTitle("计算完成")
     def joinTable(self):
         flags_beginning = self.mode2W.startFlag_Input.value()
         flags_ending = self.mode2W.endFlag_Input.value()
@@ -305,10 +305,8 @@ class calculator:
             level_ending = flags_ending // 2
             idNeeded = eval(self.mode2W.waveTable.item(row, 1).text())
             idRefused = eval(self.mode2W.waveTable.item(row, 2).text())
-            for i in range(len(idNeeded)):
-                idNeeded[i] = self.typeName[idNeeded[i]]
-            for i in range(len(idRefused)):
-                idRefused[i] = self.typeName[idRefused[i]]
+            idNeeded = list(map(lambda x : self.typeName[x], idNeeded))
+            idRefused = list(map(lambda x : self.typeName[x], idRefused))
             waveInstance = waveRequire(level_beginning, level_ending, idNeeded, idRefused)
             self.wave.remove(waveInstance)
             if not self.wave:
@@ -325,13 +323,25 @@ class calculator:
     def msgWindowInit(self):
         self.msgW = msgWindow()    
         self.msgW.return_btn.clicked.connect(self.msgExit)
+        self.msgW.copy_btn.clicked.connect(self.msgCopy)
         self.msgW.show()
     def msgExit(self):
-        self.finder.stopThread = True
-        isExit = False
-        while isExit == False:
-            isExit = not(self.thdList[0].is_alive()) and not(self.thdList[1].is_alive())
+        if self.mainW.tabWidget.currentIndex():
+            self.finder.stopThread = True
+            isExit = False
+            while isExit == False:
+                isExit = not(self.thdList[0].is_alive()) and not(self.thdList[1].is_alive())
         self.msgW.close()
+    def msgCopy(self):
+        if self.mainW.tabWidget.currentIndex():
+            if self.calcDone and self.finder.overflow == False:
+                pyperclip.copy(f"{self.result:x}")
+                QMessageBox.information(self.mode2W, "成功", f"种子 {self.result:x} 已复制！")
+                self.msgExit()
+        else:
+            pyperclip.copy(self.result)
+            QMessageBox.information(self.mode1W, "成功", "出怪类型已复制！")
+            self.msgExit()
 
 if __name__ == "__main__":
     calculator().start()

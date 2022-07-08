@@ -12,22 +12,22 @@
 
 ## 模式1使用示例 ##
 计算1号玩家，PE（存档编号为13）在种子114514下2021-2030旗的出怪：
-<img src="resources/mode1.png" title="模式1" style="zoom: 67%;" />
+<img src="mode1.png" title="模式1" style="zoom: 67%;" />
 
 结果如下：
-<img src="resources/mode1Result.png" title="结果" />
+<img src="mode1Result.png" title="结果" />
 
 ## 模式2使用示例
 
 计算节操掉尽的1号玩家PE从第3面旗到第16面旗均出扶梯且不出车丑红的种子：
 
-<img src="resources/mode2_1.png" title="模式2" style="zoom:60%" />
+<img src="mode2_1.png" title="模式2" style="zoom:60%" />
 
 
 
 作出如下设置后依次点击“加入”和“运行计算”，稍等片刻即可得出结果：
 
-<img src="resources/mode2_1Result.png" title="结果" />
+<img src="mode2_1Result.png" title="结果" />
 
 
 
@@ -35,16 +35,16 @@
 
 计算节操掉尽的2号玩家PE 3-4F 出丑炸荷叶，5-10F出梯不出车丑，11-12F出车碾盆的种子：
 
-<img src="resources/mode2_2.1.png" title="模式2"/>
+<img src="mode2_2.1.png" title="模式2"/>
 
 输入以上信息后点击“加入”
 
 如法炮制，最终输入完成的示意：
-<img src="resources/mode2_2.2.png" title="模式2" style="zoom:85%"/>
+<img src="mode2_2.2.png" title="模式2" style="zoom:85%"/>
 
 运行计算的结果：
 
-<img src="resources/mode2_2Result.png" title="结果"/>
+<img src="mode2_2Result.png" title="结果"/>
 
 
 
@@ -53,7 +53,7 @@
 ### 用户编号
 
 第几个创建的用户就是几，以本人的游戏举例：
-<img src="resources/users.png" title="用户编号"/>
+<img src="users.png" title="用户编号"/>
 
 ### 存档编号
 
@@ -70,7 +70,7 @@
 第二步，打开游戏和pvz tools
 
 第三步，打开游戏中的无尽模式，在pvz tools中点击出怪—切换详细模式
-<img src="resources/seed.png"/>
+<img src="seed.png"/>
 
 这里可以看到并修改当前的种子
 
@@ -84,7 +84,7 @@
 
 ### seedFinder模块
 
-**该模块必须在python3.8下使用。**在其他版本下使用请自行编译。
+**该模块必须在python3.8下使用。**在其他版本下使用请自行编译。如果觉得该程序不错，不如star一个吧！
 
 - #### 方法
 
