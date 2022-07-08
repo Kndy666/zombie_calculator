@@ -47,7 +47,8 @@ class msgWindow(QDialog, Ui_msgWindow):
         self.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowMinimizeButtonHint)
 
 class signalStore(QObject):
-    textUpdate = Signal(str)
+    msgUpdate = Signal(str)
+    titleUpdate = Signal(str)
 
 class waveRequire:
     def __init__(self, level_beginning, level_ending, idNeeded, idRefused):
@@ -77,7 +78,8 @@ class calculator:
                
         apply_stylesheet(self.app, 'dark_lightgreen.xml', invert_secondary=False, extra=extra)
         self.store = signalStore()
-        self.store.textUpdate.connect(self.msgUpdate)
+        self.store.msgUpdate.connect(self.msgUpdate)
+        self.store.titleUpdate.connect(self.titleUpdate)
         self.introWindowInit()
 
     def start(self):
@@ -173,8 +175,8 @@ class calculator:
                             self.result += self.typeName.inverse[i] + " "
                     self.result += f"共{amount}种\n\n"
                 self.msgWindowInit()
-                self.msgUpdate(self.result)
-                self.msgW.setWindowTitle("计算完成")
+                self.store.msgUpdate.emit(self.result)
+                self.store.titleUpdate.emit("计算完成")
             except:
                 QMessageBox.critical(self.mode1W, "错误", "出现意外的异常！")
 
@@ -202,14 +204,14 @@ class calculator:
             seed = self.mode2W.seed_Input.value()
 
             if not self.wave:
-                QMessageBox.critical(self.mode2W, "错误", "请至少添加一条要求！")
+                QMessageBox.critical(self.mode2W, "错误", "请至少添加一条条件！")
                 return
 
             waveBeginning = sorted([i.level_beginning for i in self.wave])
             waveEnding = sorted([i.level_ending for i in self.wave])
             for i in range(1, len(waveBeginning)):
                 if waveBeginning[i] < waveEnding[i - 1]:
-                    QMessageBox.critical(self.mode2W, "错误", "请检查要求的波数区间有重叠！")
+                    QMessageBox.critical(self.mode2W, "错误", "请检查输入条件的波数区间有重叠！")
                     return
             
             self.wave.sort(key=lambda x : x.level_ending)
@@ -234,20 +236,21 @@ class calculator:
                             threading.Thread(target=self.seedLogger))
             for thd in self.thdList:
                 thd.start()
-            self.msgWindowInit()   
+            self.msgWindowInit()
     def mode2CalcThread(self, idNeeded, idRefused):
         self.result = self.finder.calc(idNeeded, idRefused)
-        if self.finder.overflow:
-            self.store.textUpdate.emit("没有找到满足条件的种子！")
-        else:
-            self.calcDone = True
+        self.calcDone = True
     def seedLogger(self):
-        while self.calcDone == False and self.finder.overflow == False:
-            self.store.textUpdate.emit(f"正在计算，请稍候……\n当前已检索至种子0x{self.finder.seed:x}")
+        while self.calcDone == False and self.finder.seed >= 0:
+            self.store.msgUpdate.emit(f"正在计算，请稍候……\n当前已检索至种子0x{self.finder.seed:x}")
             time.sleep(0.2)
-        if not self.finder.overflow:
-            self.store.textUpdate.emit(f"出怪满足要求的种子为：0x{self.result:x}")
-            self.msgW.setWindowTitle("计算完成")
+        if self.finder.seed >= 0:
+            self.store.msgUpdate.emit(f"出怪满足要求的种子为：0x{self.result:x}")
+            self.store.titleUpdate.emit("计算完成")
+        else:
+            self.finder.stopThread = True
+            self.store.msgUpdate.emit("没有找到满足条件的种子！")
+            self.store.titleUpdate.emit("没有找到满足条件的种子！")
     def joinTable(self):
         flags_beginning = self.mode2W.startFlag_Input.value()
         flags_ending = self.mode2W.endFlag_Input.value()
@@ -320,6 +323,8 @@ class calculator:
     #消息展示窗口
     def msgUpdate(self, msg):
         self.msgW.msgLabal.setText(msg)
+    def titleUpdate(self, title):
+        self.msgW.setWindowTitle(title)
     def msgWindowInit(self):
         self.msgW = msgWindow()    
         self.msgW.return_btn.clicked.connect(self.msgExit)
@@ -334,7 +339,7 @@ class calculator:
         self.msgW.close()
     def msgCopy(self):
         if self.mainW.tabWidget.currentIndex():
-            if self.calcDone and self.finder.overflow == False:
+            if self.calcDone and self.finder.seed >= 0:
                 pyperclip.copy(f"{self.result:x}")
                 QMessageBox.information(self.mode2W, "成功", f"种子 {self.result:x} 已复制！")
                 self.msgExit()

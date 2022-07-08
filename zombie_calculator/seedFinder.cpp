@@ -57,7 +57,7 @@ class seedCalc
 {
 public:
 	int currentProcess = 0;
-	bool stopThread = false, overflow = false;
+	bool stopThread = false;
 	int calc(const vector<vector<int> >& idNeeded, const vector<vector<int> >& idRefused);
 	seedCalc(int uid, int mod, const string& scene, int level_beginning, int level_ending, int offset)
 	{
@@ -80,7 +80,7 @@ private:
 void seedCalc::calcThread(int step, int startSeed, int code)
 {
 	int seed = startSeed;
-	while (!res && !stopThread && !overflow)
+	while (!res && !stopThread)
 	{
 		bool fullFilled = false, aim1, aim2;
 		for (int lvl = level_beginning; lvl < level_ending; ++lvl)
@@ -135,7 +135,6 @@ void seedCalc::calcThread(int step, int startSeed, int code)
 			break;
 		}
 		if (!code)currentProcess = seed;
-		if (seed < 0)overflow = true;
 	}
 }
 
@@ -166,7 +165,6 @@ PYBIND11_MODULE(seedFinder, m)
 		.def(py::init<int, int, const string&, int, int, int>())
 		.def("calc", &seedCalc::calc, "start to calculate.")
 		.def_readwrite("stopThread", &seedCalc::stopThread)
-		.def_readwrite("overflow", &seedCalc::overflow)
 		.def_readwrite("seed", &seedCalc::currentProcess);
 	m.def("appear", &appear, "use seed to get a list with zombies id.",
 		py::arg("uid"), py::arg("mode"), py::arg("scene"), py::arg("level"), py::arg("seed"));
