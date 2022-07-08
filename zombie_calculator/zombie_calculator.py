@@ -49,6 +49,7 @@ class msgWindow(QDialog, Ui_msgWindow):
 class signalStore(QObject):
     msgUpdate = Signal(str)
     titleUpdate = Signal(str)
+    alert = Signal()
 
 class waveRequire:
     def __init__(self, level_beginning, level_ending, idNeeded, idRefused):
@@ -80,6 +81,7 @@ class calculator:
         self.store = signalStore()
         self.store.msgUpdate.connect(self.msgUpdate)
         self.store.titleUpdate.connect(self.titleUpdate)
+        self.store.alert.connect(self.completeAlert)
         self.introWindowInit()
 
     def start(self):
@@ -243,6 +245,7 @@ class calculator:
     def seedLogger(self):
         while self.calcDone == False and self.finder.seed >= 0:
             self.store.msgUpdate.emit(f"正在计算，请稍候……\n当前已检索至种子0x{self.finder.seed:x}")
+            self.store.titleUpdate.emit(f"正在计算中... 当前进度为{self.finder.seed / 0x7FFFFFFF * 100 : .2f}%")
             time.sleep(0.2)
         if self.finder.seed >= 0:
             self.store.msgUpdate.emit(f"出怪满足要求的种子为：0x{self.result:x}")
@@ -251,6 +254,8 @@ class calculator:
             self.finder.stopThread = True
             self.store.msgUpdate.emit("没有找到满足条件的种子！")
             self.store.titleUpdate.emit("没有找到满足条件的种子！")
+        if not self.finder.stopThread:
+            self.store.alert.emit()
     def joinTable(self):
         flags_beginning = self.mode2W.startFlag_Input.value()
         flags_ending = self.mode2W.endFlag_Input.value()
@@ -325,8 +330,11 @@ class calculator:
         self.msgW.msgLabal.setText(msg)
     def titleUpdate(self, title):
         self.msgW.setWindowTitle(title)
+    def completeAlert(self):
+        self.app.alert(self.mainW)
+        self.app.beep()
     def msgWindowInit(self):
-        self.msgW = msgWindow()    
+        self.msgW = msgWindow()
         self.msgW.return_btn.clicked.connect(self.msgExit)
         self.msgW.copy_btn.clicked.connect(self.msgCopy)
         self.msgW.show()
