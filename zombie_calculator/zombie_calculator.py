@@ -75,6 +75,7 @@ class calculator:
             "AQE(水族馆无尽,Aquarium Endless)" : "AQ"
             }
         self.typeName = bidict({'普通' : 0, '旗帜' : 1, '路障' : 2, '撑杆' : 3, '铁桶' : 4, '读报' : 5, '铁门' : 6, '橄榄' : 7, '舞王' : 8, '伴舞' : 9, '鸭子' : 10, '潜水' : 11, '冰车' : 12, '雪橇' : 13, '海豚' : 14, '小丑' : 15, '气球' : 16, '矿工' : 17, '跳跳' : 18, '雪人' : 19, '蹦极' : 20, '扶梯' : 21, '投篮' : 22, '白眼' : 23, '小鬼' : 24, '僵王' : 25, '豌豆' : 26, '坚果' : 27, '辣椒' : 28, '机枪' : 29, '窝瓜' : 30, '高坚果' : 31, '红眼' : 32})
+        self.logInterval = 0.2
         self.app = QApplication(sys.argv)
                
         apply_stylesheet(self.app, 'dark_lightgreen.xml', invert_secondary=False, extra=extra)
@@ -179,6 +180,7 @@ class calculator:
                 self.msgWindowInit()
                 self.store.msgUpdate.emit(self.result)
                 self.store.titleUpdate.emit("计算完成")
+                self.store.alert.emit()
             except:
                 QMessageBox.critical(self.mode1W, "错误", "出现意外的异常！")
 
@@ -244,9 +246,11 @@ class calculator:
         self.calcDone = True
     def seedLogger(self):
         while self.calcDone == False and self.finder.seed >= 0:
-            self.store.msgUpdate.emit(f"正在计算，请稍候……\n当前已检索至种子0x{self.finder.seed:x}")
+            lastSeed = self.finder.seed
+            time.sleep(self.logInterval)
+            leftTime = self.logInterval * (0x7FFFFFFF - self.finder.seed) / (self.finder.seed - lastSeed) / 60
+            self.store.msgUpdate.emit(f"正在计算，请稍候……\n当前已检索至种子0x{self.finder.seed:x}\n进度为{self.finder.seed / 0x7FFFFFFF * 100 : .2f}% 剩余时间为{leftTime : .2f}mins")
             self.store.titleUpdate.emit(f"正在计算中... 当前进度为{self.finder.seed / 0x7FFFFFFF * 100 : .2f}%")
-            time.sleep(0.2)
         if self.finder.seed >= 0:
             self.store.msgUpdate.emit(f"出怪满足要求的种子为：0x{self.result:x}")
             self.store.titleUpdate.emit("计算完成")
@@ -333,6 +337,7 @@ class calculator:
     def completeAlert(self):
         self.app.alert(self.mainW)
         self.app.beep()
+        self.msgW.copy_btn.setEnabled(True)
     def msgWindowInit(self):
         self.msgW = msgWindow()
         self.msgW.return_btn.clicked.connect(self.msgExit)
