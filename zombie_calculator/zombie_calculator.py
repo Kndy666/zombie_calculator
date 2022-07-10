@@ -1,5 +1,5 @@
-from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import pyqtSignal as Signal, QObject, Qt
+from PyQt5.QtGui import QIcon, QGuiApplication
+from PyQt5.QtCore import pyqtSignal as Signal, QObject, Qt, QCoreApplication
 from PyQt5.QtWidgets import QApplication, QMessageBox, QMainWindow, QWidget, QCheckBox, QDialog, QHeaderView, QTableWidgetItem
 from qt_material import apply_stylesheet
 
@@ -76,8 +76,11 @@ class calculator:
             }
         self.typeName = bidict({'普通' : 0, '旗帜' : 1, '路障' : 2, '撑杆' : 3, '铁桶' : 4, '读报' : 5, '铁门' : 6, '橄榄' : 7, '舞王' : 8, '伴舞' : 9, '鸭子' : 10, '潜水' : 11, '冰车' : 12, '雪橇' : 13, '海豚' : 14, '小丑' : 15, '气球' : 16, '矿工' : 17, '跳跳' : 18, '雪人' : 19, '蹦极' : 20, '扶梯' : 21, '投篮' : 22, '白眼' : 23, '小鬼' : 24, '僵王' : 25, '豌豆' : 26, '坚果' : 27, '辣椒' : 28, '机枪' : 29, '窝瓜' : 30, '高坚果' : 31, '红眼' : 32})
         self.logInterval = 0.2
+        QCoreApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
+        QCoreApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
+        QGuiApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
         self.app = QApplication(sys.argv)
-               
+        
         apply_stylesheet(self.app, 'dark_lightgreen.xml', invert_secondary=False, extra=extra)
         self.store = signalStore()
         self.store.msgUpdate.connect(self.msgUpdate)
