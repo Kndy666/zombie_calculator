@@ -156,9 +156,6 @@ class calculator:
             if not flags_beginning % 2 or flags_ending % 2:
                 QMessageBox.critical(self.mode1W, "错误", "上半轮旗数为奇数，下半轮旗数为偶数！") 
                 return
-            if level_ending - level_beginning >= 20:
-                QMessageBox.critical(self.mode1W, "错误", "请不要一次计算过大的范围！")
-                return
             if hasattr(self, "scene") == False:
                 QMessageBox.critical(self.mode1W, "错误", "请选择场景！")
                 return
@@ -279,9 +276,6 @@ class calculator:
         if not flags_beginning % 2 or flags_ending % 2:
             QMessageBox.critical(self.mode2W, "错误", "上半轮旗数为奇数，下半轮旗数为偶数！")
             return
-        if level_ending - level_beginning >= 20:
-                QMessageBox.critical(self.mode2W, "错误", "所求关数过多，过于掉节操！")
-                raise
         if len(self.idNeeded) > 11:
             QMessageBox.critical(self.mode2W, "错误", "需求僵尸过多！")
             return
