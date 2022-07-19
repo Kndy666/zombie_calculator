@@ -5,8 +5,7 @@
     <ProjectGuid>f2118877-46a7-4d38-9bec-0d8cc23d4750</ProjectGuid>
     <ProjectHome>.</ProjectHome>
     <StartupFile>zombie_calculator.py</StartupFile>
-    <SearchPath>
-    </SearchPath>
+    <SearchPath>..\zombie_calculator</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>zombie_calculator</Name>
@@ -27,6 +26,7 @@
     <Compile Include="gui\main2.py" />
     <Compile Include="gui\mode1.py" />
     <Compile Include="gui\mode2.py" />
+    <Compile Include="gui\modify.py" />
     <Compile Include="gui\msg.py" />
     <Compile Include="gui\__init__.py" />
     <Compile Include="zombie_calculator.py" />
@@ -36,14 +36,33 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="gui\" />
+    <Folder Include="gui\__pycache__\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="gui\introduction.ui" />
     <Content Include="gui\main.ui" />
     <Content Include="gui\mode1.ui" />
     <Content Include="gui\mode2.ui" />
+    <Content Include="gui\modify.ui" />
     <Content Include="gui\msg.ui" />
-    <Content Include="seedFinder.cpp" />
+    <Content Include="gui\__pycache__\introduction.cpython-38.pyc" />
+    <Content Include="gui\__pycache__\main.cpython-38.pyc" />
+    <Content Include="gui\__pycache__\mode1.cpython-38.pyc" />
+    <Content Include="gui\__pycache__\mode2.cpython-38.pyc" />
+    <Content Include="gui\__pycache__\msg.cpython-38.pyc" />
+    <Content Include="gui\__pycache__\__init__.cpython-38.pyc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\asmInject\asmInject.vcxproj">
+      <Name>asmInject</Name>
+      <Project>{1123728e-d345-432c-9f09-aea830b804cd}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\seedFinder\seedFinder.vcxproj">
+      <Name>seedFinder</Name>
+      <Project>{45f91261-55af-4a29-a098-47ef348b48ef}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

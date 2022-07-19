@@ -365,3 +365,7 @@ MigrationBackup/
 FodyWeavers.xsd
 /zombie_calculator/compile.cmd
 /zombie_calculator.pyperf
+/zombie_calculator/module1.py
+*.vcxproj
+*.filters
+*.cmd

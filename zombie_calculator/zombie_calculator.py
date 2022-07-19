@@ -1,6 +1,6 @@
 from PyQt5.QtGui import QIcon, QGuiApplication
 from PyQt5.QtCore import pyqtSignal as Signal, QObject, Qt, QCoreApplication
-from PyQt5.QtWidgets import QApplication, QMessageBox, QMainWindow, QWidget, QCheckBox, QDialog, QHeaderView, QTableWidgetItem
+from PyQt5.QtWidgets import QApplication, QMessageBox, QMainWindow, QWidget, QCheckBox, QDialog, QHeaderView, QTableWidgetItem, QStatusBar, QGraphicsOpacityEffect, QLabel
 from qt_material import apply_stylesheet
 
 from bidict import bidict
@@ -9,6 +9,7 @@ import sys
 import time
 import threading
 import seedFinder
+import asmInject
 import webbrowser
 import pyperclip
 
@@ -17,6 +18,7 @@ from gui.main import mainWindow
 from gui.mode1 import Ui_mode1Window
 from gui.mode2 import Ui_mode2Window
 from gui.msg import Ui_msgWindow
+from gui.modify import Ui_modifyWindow
 
 class introductionWindow(QMainWindow, Ui_introductionWindow):
     def __init__(self, parent=None):
@@ -45,6 +47,41 @@ class msgWindow(QDialog, Ui_msgWindow):
         self.setWindowIcon(QIcon("icon.ico"))
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowMinimizeButtonHint)
+class modifyWindow(QWidget, Ui_modifyWindow):
+    def __init__(self, parent=None):
+        super(modifyWindow, self).__init__(parent)
+        self.setupUi(self)
+        self.setWindowIcon(QIcon("icon.ico"))
+        self.setAttribute(Qt.WA_DeleteOnClose)
+        self.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowMinimizeButtonHint | Qt.WindowCloseButtonHint)
+
+        self.statusBar = QStatusBar()
+        self.statusLabel = QLabel()
+        self.statusBar.addWidget(self.statusLabel, 1)
+        self.statusBar.setSizeGripEnabled(False)
+        opacityEffect = QGraphicsOpacityEffect()
+        self.statusBar.setGraphicsEffect(opacityEffect)
+        opacityEffect.setOpacity(0.7)
+        self.layout().addWidget(self.statusBar)
+
+        self.getInitSeed()
+    def getInitSeed(self):
+        self.injecter = asmInject.seedInject()
+        self.seed_Input.setValue(self.injecter.getRandomSeed())
+        self.compareResult(self.injecter.findResult)
+    def compareResult(self, res):
+        if res == self.injecter.OK:
+            self.statusLabel.setText("<font color=\"#00FF00\" style=\"font-style: italic;\">成功找到游戏</font>")
+            return True
+        elif res == self.injecter.WrongVersion:
+            self.statusLabel.setText("<font color=\"#FFFF00\" style=\"font-style: italic;\">不支持的游戏版本</font>")
+            return False
+        elif res == self.injecter.NotFound:
+            self.statusLabel.setText("<font color=\"#FF0000\" style=\"font-style: italic;\>没有找到游戏</font>")
+            return False
+        elif res == self.injecter.OpenError:
+            self.statusLabel.setText("<font color=\"#FF0000\" style=\"font-style: italic;\>游戏进程打开出错</font>")
+            return False
 
 class signalStore(QObject):
     msgUpdate = Signal(str)
@@ -118,6 +155,7 @@ class calculator:
     def introWindowInit(self):
         self.introW = introductionWindow()
         self.introW.start_btn.clicked.connect(self.showMainWindow)
+        self.introW.inject_btn.clicked.connect(self.modifyWindowInit)
         self.introW.exit_btn.clicked.connect(lambda : self.app.quit())
         self.introW.help_btn.clicked.connect(lambda : webbrowser.open(Path.cwd() / "help" / "help.html"))
 
@@ -246,11 +284,14 @@ class calculator:
         self.calcDone = True
     def seedLogger(self):
         while self.calcDone == False and self.finder.seed >= 0:
-            lastSeed = self.finder.seed
-            time.sleep(self.logInterval)
-            leftTime = self.logInterval * (0x7FFFFFFF - self.finder.seed) / (self.finder.seed - lastSeed) / 60
-            self.store.msgUpdate.emit(f"正在计算，请稍候……\n当前已检索至种子0x{self.finder.seed:x}\n进度为{self.finder.seed / 0x7FFFFFFF * 100 : .2f}% 剩余时间为{leftTime : .2f}mins")
-            self.store.titleUpdate.emit(f"正在计算中... 当前进度为{self.finder.seed / 0x7FFFFFFF * 100 : .2f}%")
+            try:
+                lastSeed = self.finder.seed
+                time.sleep(self.logInterval)
+                leftTime = self.logInterval * (0x7FFFFFFF - self.finder.seed) / (self.finder.seed - lastSeed) / 60
+                self.store.msgUpdate.emit(f"正在计算，请稍候……\n当前已检索至种子0x{self.finder.seed:x}\n进度为{self.finder.seed / 0x7FFFFFFF * 100 : .2f}% 剩余时间为{leftTime : .2f}mins")
+                self.store.titleUpdate.emit(f"正在计算中... 当前进度为{self.finder.seed / 0x7FFFFFFF * 100 : .2f}%")
+            except ZeroDivisionError:
+                self.store.titleUpdate.emit("计算完成")
         if self.finder.seed >= 0:
             self.store.msgUpdate.emit(f"出怪满足要求的种子为：0x{self.result:x}")
             self.store.titleUpdate.emit("计算完成")
@@ -325,7 +366,7 @@ class calculator:
             self.mode2W.waveTable.removeRow(row)
         except AttributeError:
             return
-    
+
     #消息展示窗口
     def msgUpdate(self, msg):
         self.msgW.msgLabal.setText(msg)
@@ -357,6 +398,21 @@ class calculator:
             pyperclip.copy(self.result)
             QMessageBox.information(self.mode1W, "成功", "出怪类型已复制！")
             self.msgExit()
+
+    #种子修改窗口
+    def modifyWindowInit(self):
+        self.modifyW = modifyWindow()
+        self.modifyW.getSeed_btn.clicked.connect(lambda : self.modifyW.seed_Input.setValue(self.modifyW.injecter.getRandomSeed()))
+        self.modifyW.modifySeed_btn.clicked.connect(lambda : self.modifySeed(self.modifyW.seed_Input.value()))
+        self.modifyW.findGame_btn.clicked.connect(self.reFindGame)
+        self.modifyW.show()
+    def reFindGame(self):
+        self.modifyW.injecter.findGame()
+        self.modifyW.compareResult(self.modifyW.injecter.findResult)
+    def modifySeed(self, seed):
+        if self.modifyW.compareResult(self.modifyW.injecter.findResult):
+            self.modifyW.injecter.setRandomSeed(seed)
+            self.modifyW.injecter.internalSpawn()
 
 if __name__ == "__main__":
     calculator().start()
