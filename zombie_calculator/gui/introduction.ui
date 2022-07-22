@@ -230,8 +230,19 @@
      <height>23</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuStyle">
+    <property name="title">
+     <string>Styles</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuDensity">
+    <property name="title">
+     <string>Density</string>
+    </property>
+   </widget>
+   <addaction name="menuStyle"/>
+   <addaction name="menuDensity"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
  <connections/>

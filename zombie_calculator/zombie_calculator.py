@@ -1,7 +1,7 @@
 from PyQt5.QtGui import QIcon, QGuiApplication
 from PyQt5.QtCore import pyqtSignal as Signal, QObject, Qt, QCoreApplication
-from PyQt5.QtWidgets import QApplication, QMessageBox, QMainWindow, QWidget, QCheckBox, QDialog, QHeaderView, QTableWidgetItem, QStatusBar, QGraphicsOpacityEffect, QLabel
-from qt_material import apply_stylesheet
+from PyQt5.QtWidgets import QApplication, QMessageBox, QMainWindow, QWidget, QCheckBox, QDialog, QHeaderView, QTableWidgetItem, QStatusBar, QGraphicsOpacityEffect, QLabel, QActionGroup, QAction
+from qt_material import apply_stylesheet, QtStyleTools
 
 from bidict import bidict
 from pathlib import Path
@@ -11,6 +11,7 @@ import threading
 import seedFinder
 import asmInject
 import webbrowser
+import copy
 import pyperclip
 
 from gui.introduction import Ui_introductionWindow
@@ -20,20 +21,74 @@ from gui.mode2 import Ui_mode2Window
 from gui.msg import Ui_msgWindow
 from gui.modify import Ui_modifyWindow
 
-class introductionWindow(QMainWindow, Ui_introductionWindow):
-    def __init__(self, parent=None):
+from config import Config
+
+class introductionWindow(QMainWindow, Ui_introductionWindow, QtStyleTools):
+    def __init__(self, config, parent=None):
         super(introductionWindow, self).__init__(parent)
+
+        self.configManager = config
+
         self.setupUi(self)
         self.setWindowIcon(QIcon("icon.ico"))
+    def update_theme_event(self, parent):
+        density = [
+            action.text()
+            for action in self.menu_density_.actions()
+            if action.isChecked()
+        ][0]
+        theme = [
+            action.text()
+            for action in self.menu_theme_.actions()
+            if action.isChecked()
+        ][0]
+
+        if theme == "default":
+            theme = self.configManager.config["defaultTheme"]
+        else:
+            self.configManager.config["defaultTheme"] = theme 
+        self.configManager.config["defaultDensity"] = density
+        self.configManager.config["extra"]["density_scale"] = density
+        self.configManager.updateConfig(self.configManager.config)
+
+        self.extra_values['density_scale'] = density
+
+        self.apply_stylesheet(
+            parent,
+            theme=theme,
+            invert_secondary=theme.startswith('light'),
+            extra=self.extra_values,
+            callable_=self.update_buttons,
+        )
+    def add_menu_density(self, parent, menu):
+        self.menu_density_ = menu
+        action_group = QActionGroup(menu)
+        action_group.setExclusive(True)
+
+        for density in map(str, range(-3, 4)):
+            action = QAction(parent)
+            action.triggered.connect(lambda: self.update_theme_event(parent))
+            action.setText(density)
+            action.setCheckable(True)
+            action.setChecked(density == self.configManager.config["defaultDensity"])
+            action.setActionGroup(action_group)
+            menu.addAction(action)
+            action_group.addAction(action)
 class mode1Window(QWidget, Ui_mode1Window):
-    def __init__(self, parent=None):
+    def __init__(self, config, parent=None):
         super(mode1Window, self).__init__(parent)
+
+        self.configManager = config
+
         self.setupUi(self)
         self.setWindowIcon(QIcon("icon.ico"))
         self.setAttribute(Qt.WA_DeleteOnClose)
 class mode2Window(QWidget, Ui_mode2Window):
-    def __init__(self, parent=None):
+    def __init__(self, config, parent=None):
         super(mode2Window, self).__init__(parent)
+
+        self.configManager = config
+
         self.setupUi(self) 
         self.setWindowIcon(QIcon("icon.ico"))
         self.setAttribute(Qt.WA_DeleteOnClose)
@@ -41,15 +96,21 @@ class mode2Window(QWidget, Ui_mode2Window):
         self.waveTable.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
         self.waveTable.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
 class msgWindow(QDialog, Ui_msgWindow):
-    def __init__(self, parent=None):
+    def __init__(self, config, parent=None):
         super(msgWindow, self).__init__(parent)
+
+        self.configManager = config
+
         self.setupUi(self)
         self.setWindowIcon(QIcon("icon.ico"))
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowMinimizeButtonHint)
 class modifyWindow(QWidget, Ui_modifyWindow):
-    def __init__(self, parent=None):
+    def __init__(self, config, parent=None):
         super(modifyWindow, self).__init__(parent)
+
+        self.configManager = config
+
         self.setupUi(self)
         self.setWindowIcon(QIcon("icon.ico"))
         self.setAttribute(Qt.WA_DeleteOnClose)
@@ -71,16 +132,20 @@ class modifyWindow(QWidget, Ui_modifyWindow):
         self.compareResult(self.injecter.findResult)
     def compareResult(self, res):
         if res == self.injecter.OK:
-            self.statusLabel.setText("<font color=\"#00FF00\" style=\"font-style: italic;\">成功找到游戏</font>")
+            color = self.configManager.config["alertColor"]["ok"]
+            self.statusLabel.setText(f"<font color=\"{color}\" style=\"font-style: italic;\">成功找到游戏</font>")
             return True
         elif res == self.injecter.WrongVersion:
-            self.statusLabel.setText("<font color=\"#FFFF00\" style=\"font-style: italic;\">不支持的游戏版本</font>")
+            color = self.configManager.config["alertColor"]["warning"]
+            self.statusLabel.setText(f"<font color=\"{color}\" style=\"font-style: italic;\">不支持的游戏版本</font>")
             return False
         elif res == self.injecter.NotFound:
-            self.statusLabel.setText("<font color=\"#FF0000\" style=\"font-style: italic;\>没有找到游戏</font>")
+            color = self.configManager.config["alertColor"]["error"]
+            self.statusLabel.setText(f"<font color=\"{color}\" style=\"font-style: italic;\">没有找到游戏</font>")
             return False
         elif res == self.injecter.OpenError:
-            self.statusLabel.setText("<font color=\"#FF0000\" style=\"font-style: italic;\>游戏进程打开出错</font>")
+            color = self.configManager.config["alertColor"]["error"]
+            self.statusLabel.setText(f"<font color=\"{color}\" style=\"font-style: italic;\">游戏进程打开出错</font>")
             return False
 
 class signalStore(QObject):
@@ -100,7 +165,9 @@ class waveRequire:
 class calculator:
     #工具方法&初始化
     def __init__(self):
-        extra = {'density_scale': '-1'}
+        self.configManager = Config()
+        self.configManager.updateConfig(self.configManager.readConfig())
+        self.logInterval = self.configManager.config["logInterval"]
         self.sceneName = {
             "DE(白天无尽,Day Endless)" : "DAY",
             "NE(夜晚无尽,Night Endless)" : "NIGHT",
@@ -112,13 +179,12 @@ class calculator:
             "AQE(水族馆无尽,Aquarium Endless)" : "AQ"
             }
         self.typeName = bidict({'普通' : 0, '旗帜' : 1, '路障' : 2, '撑杆' : 3, '铁桶' : 4, '读报' : 5, '铁门' : 6, '橄榄' : 7, '舞王' : 8, '伴舞' : 9, '鸭子' : 10, '潜水' : 11, '冰车' : 12, '雪橇' : 13, '海豚' : 14, '小丑' : 15, '气球' : 16, '矿工' : 17, '跳跳' : 18, '雪人' : 19, '蹦极' : 20, '扶梯' : 21, '投篮' : 22, '白眼' : 23, '小鬼' : 24, '僵王' : 25, '豌豆' : 26, '坚果' : 27, '辣椒' : 28, '机枪' : 29, '窝瓜' : 30, '高坚果' : 31, '红眼' : 32})
-        self.logInterval = 0.2
         QCoreApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
         QCoreApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
         QGuiApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
         self.app = QApplication(sys.argv)
-        
-        apply_stylesheet(self.app, 'dark_lightgreen.xml', invert_secondary=False, extra=extra)
+
+        apply_stylesheet(self.app, self.configManager.config["defaultTheme"], invert_secondary="light_" in self.configManager.config["defaultTheme"], extra=copy.deepcopy(self.configManager.config["extra"]))
         self.store = signalStore()
         self.store.msgUpdate.connect(self.msgUpdate)
         self.store.titleUpdate.connect(self.titleUpdate)
@@ -153,7 +219,12 @@ class calculator:
 
     #开始窗口
     def introWindowInit(self):
-        self.introW = introductionWindow()
+        self.introW = introductionWindow(self.configManager)
+
+        self.introW.set_extra(copy.deepcopy(self.configManager.config["extra"]))
+        self.introW.add_menu_density(self.app, self.introW.menuDensity)
+        self.introW.add_menu_theme(self.app, self.introW.menuStyle)
+
         self.introW.start_btn.clicked.connect(self.showMainWindow)
         self.introW.inject_btn.clicked.connect(self.modifyWindowInit)
         self.introW.exit_btn.clicked.connect(lambda : self.app.quit())
@@ -173,7 +244,7 @@ class calculator:
 
     #模式1
     def mode1WindowInit(self):
-        self.mode1W = mode1Window()
+        self.mode1W = mode1Window(self.configManager)
         self.mode1W.calc_btn.clicked.connect(self.mode1Calc)
         self.mode1W.sceneGroup.buttonClicked.connect(lambda : self.rBtnGroupClicked("mode1"))
         self.mode1W.return_btn.clicked.connect(lambda : self.mainW.close())
@@ -224,7 +295,7 @@ class calculator:
 
     #模式2
     def mode2WindowInit(self):
-        self.mode2W = mode2Window()
+        self.mode2W = mode2Window(self.configManager)
         self.mode2W.calc_btn.clicked.connect(self.mode2Calc)
         self.mode2W.join_btn.clicked.connect(self.joinTable)
         self.mode2W.del_btn.clicked.connect(self.delTable)
@@ -377,7 +448,7 @@ class calculator:
         self.app.beep()
         self.msgW.copy_btn.setEnabled(True)
     def msgWindowInit(self):
-        self.msgW = msgWindow()
+        self.msgW = msgWindow(self.configManager)
         self.msgW.return_btn.clicked.connect(self.msgExit)
         self.msgW.copy_btn.clicked.connect(self.msgCopy)
         self.msgW.show()
@@ -401,7 +472,7 @@ class calculator:
 
     #种子修改窗口
     def modifyWindowInit(self):
-        self.modifyW = modifyWindow()
+        self.modifyW = modifyWindow(self.configManager)
         self.modifyW.getSeed_btn.clicked.connect(lambda : self.modifyW.seed_Input.setValue(self.modifyW.injecter.getRandomSeed()))
         self.modifyW.modifySeed_btn.clicked.connect(lambda : self.modifySeed(self.modifyW.seed_Input.value()))
         self.modifyW.findGame_btn.clicked.connect(self.reFindGame)

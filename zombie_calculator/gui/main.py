@@ -31,6 +31,7 @@ class mainWindow(QMainWindow):
         super(mainWindow, self).__init__(parent)
         self.setWindowIcon(QIcon("icon.ico"))
         self.setAttribute(Qt.WA_DeleteOnClose)
+        self.setWindowModality(Qt.ApplicationModal)
         self.tabWidget = TabWidget()
         self.setCentralWidget(self.tabWidget)
         self.tabWidget.currentChanged.connect(self.updateSize)
