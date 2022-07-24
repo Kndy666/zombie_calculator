@@ -1,5 +1,5 @@
 from PyQt5.QtGui import QIcon, QGuiApplication
-from PyQt5.QtCore import pyqtSignal as Signal, QObject, Qt, QCoreApplication
+from PyQt5.QtCore import pyqtSignal as Signal, QObject, Qt, QCoreApplication, QTranslator, QEvent, QLocale
 from PyQt5.QtWidgets import QApplication, QMessageBox, QMainWindow, QWidget, QCheckBox, QDialog, QHeaderView, QTableWidgetItem, QStatusBar, QGraphicsOpacityEffect, QLabel, QActionGroup, QAction
 from qt_material import apply_stylesheet, QtStyleTools
 
@@ -22,6 +22,8 @@ from gui.msg import Ui_msgWindow
 from gui.modify import Ui_modifyWindow
 
 from config import Config
+
+_translate = QCoreApplication.translate
 
 class introductionWindow(QMainWindow, Ui_introductionWindow, QtStyleTools):
     def __init__(self, config, parent=None):
@@ -74,6 +76,9 @@ class introductionWindow(QMainWindow, Ui_introductionWindow, QtStyleTools):
             action.setActionGroup(action_group)
             menu.addAction(action)
             action_group.addAction(action)
+    def changeEvent(self, event):
+        if event.type() == QEvent.LanguageChange:
+            self.retranslateUi(self)
 class mode1Window(QWidget, Ui_mode1Window):
     def __init__(self, config, parent=None):
         super(mode1Window, self).__init__(parent)
@@ -133,19 +138,23 @@ class modifyWindow(QWidget, Ui_modifyWindow):
     def compareResult(self, res):
         if res == self.injecter.OK:
             color = self.configManager.config["alertColor"]["ok"]
-            self.statusLabel.setText(f"<font color=\"{color}\" style=\"font-style: italic;\">成功找到游戏</font>")
+            info = _translate("calculator", "Successfully found game.")
+            self.statusLabel.setText(f"<font color=\"{color}\" style=\"font-style: italic;\">{info}</font>")
             return True
         elif res == self.injecter.WrongVersion:
             color = self.configManager.config["alertColor"]["warning"]
-            self.statusLabel.setText(f"<font color=\"{color}\" style=\"font-style: italic;\">不支持的游戏版本</font>")
+            info = _translate("calculator", "No support versions.")
+            self.statusLabel.setText(f"<font color=\"{color}\" style=\"font-style: italic;\">{info}</font>")
             return False
         elif res == self.injecter.NotFound:
             color = self.configManager.config["alertColor"]["error"]
-            self.statusLabel.setText(f"<font color=\"{color}\" style=\"font-style: italic;\">没有找到游戏</font>")
+            info = _translate("calculator", "Game not found.")
+            self.statusLabel.setText(f"<font color=\"{color}\" style=\"font-style: italic;\">{info}</font>")
             return False
         elif res == self.injecter.OpenError:
             color = self.configManager.config["alertColor"]["error"]
-            self.statusLabel.setText(f"<font color=\"{color}\" style=\"font-style: italic;\">游戏进程打开出错</font>")
+            info = _translate("calculator", "Process open error")
+            self.statusLabel.setText(f"<font color=\"{color}\" style=\"font-style: italic;\">{info}</font>")
             return False
 
 class signalStore(QObject):
@@ -168,28 +177,32 @@ class calculator:
         self.configManager = Config()
         self.configManager.updateConfig(self.configManager.readConfig())
         self.logInterval = self.configManager.config["logInterval"]
-        self.sceneName = {
-            "DE(白天无尽,Day Endless)" : "DAY",
-            "NE(夜晚无尽,Night Endless)" : "NIGHT",
-            "PE(泳池无尽,Pool Endless)" : "POOL",
-            "FE(雾夜无尽,Fog Endless)" : "FOG",
-            "RE(屋顶无尽,Roof Endless)" : "ROOF",
-            "ME(月夜无尽,Moon Endless)" : "MOON",
-            "MGE(蘑菇园无尽,Mushroom Garden Endless)" : "MG",
-            "AQE(水族馆无尽,Aquarium Endless)" : "AQ"
-            }
-        self.typeName = bidict({'普通' : 0, '旗帜' : 1, '路障' : 2, '撑杆' : 3, '铁桶' : 4, '读报' : 5, '铁门' : 6, '橄榄' : 7, '舞王' : 8, '伴舞' : 9, '鸭子' : 10, '潜水' : 11, '冰车' : 12, '雪橇' : 13, '海豚' : 14, '小丑' : 15, '气球' : 16, '矿工' : 17, '跳跳' : 18, '雪人' : 19, '蹦极' : 20, '扶梯' : 21, '投篮' : 22, '白眼' : 23, '小鬼' : 24, '僵王' : 25, '豌豆' : 26, '坚果' : 27, '辣椒' : 28, '机枪' : 29, '窝瓜' : 30, '高坚果' : 31, '红眼' : 32})
+        
         QCoreApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
         QCoreApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
         QGuiApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
         self.app = QApplication(sys.argv)
-
         apply_stylesheet(self.app, self.configManager.config["defaultTheme"], invert_secondary="light_" in self.configManager.config["defaultTheme"], extra=copy.deepcopy(self.configManager.config["extra"]))
+        
+        language = QLocale().language()
+        self.trans = QTranslator()
+        if language == QLocale.Chinese:
+            self.trans.load("language\\zh_CN.qm")
+        self.app.installTranslator(self.trans)
+
         self.store = signalStore()
         self.store.msgUpdate.connect(self.msgUpdate)
         self.store.titleUpdate.connect(self.titleUpdate)
         self.store.alert.connect(self.completeAlert)
         self.introWindowInit()
+
+    def changeLanguage(self):
+        language = self.introW.sender().text()
+        if language == "English":
+            self.app.removeTranslator(self.trans)
+        elif language == "中文":
+            self.trans.load("language\\zh_CN.qm")
+            self.app.installTranslator(self.trans)
 
     def start(self):
         self.introW.show()
@@ -197,11 +210,11 @@ class calculator:
 
     def rBtnGroupClicked(self, sender):
         if sender == "mode1":
-            btn = self.mode1W.sceneGroup.checkedButton()            
-            self.scene = self.sceneName[btn.text()]
+            btn = self.mode1W.sceneGroup.checkedButton()
+            self.scene = btn.objectName()[:-5]
         elif sender == "mode2":
-            btn = self.mode2W.sceneGroup.checkedButton()            
-            self.scene = self.sceneName[btn.text()]
+            btn = self.mode2W.sceneGroup.checkedButton()
+            self.scene = btn.objectName()[:-5]
     def nCheckBoxClicked(self):
         box = self.mode2W.sender()
         id = self.typeName[box.text()]
@@ -229,19 +242,29 @@ class calculator:
         self.introW.inject_btn.clicked.connect(self.modifyWindowInit)
         self.introW.exit_btn.clicked.connect(lambda : self.app.quit())
         self.introW.help_btn.clicked.connect(lambda : webbrowser.open(Path.cwd() / "help" / "help.html"))
+        for action in self.introW.menuLanguage.actions():
+            action.triggered.connect(self.changeLanguage)
 
     #主窗口
     def mainWindowInit(self):
         self.mainW = mainWindow()
-        self.mode1WindowInit()
-        self.mode2WindowInit()  
+        self.mode2WindowInit() 
+        self.mode1WindowInit()      
         
-        self.mainW.tabWidget.addTab(self.mode1W, "模式1")
-        self.mainW.tabWidget.addTab(self.mode2W, "模式2")
+        self.mainW.tabWidget.addTab(self.mode1W, _translate("calculator", "Mode1"))
+        self.mainW.tabWidget.addTab(self.mode2W, _translate("calculator", "Mode2"))
     def showMainWindow(self):
         self.mainWindowInit()
         self.mainW.show()
 
+    def borderCheck(self, parent, flags_beginning, flags_ending):
+        if not flags_beginning % 2 or flags_ending % 2:
+            QMessageBox.critical(parent, _translate("calculator", "Error"), _translate("calculator", "startingFlag should be odds, endingFlags should be even."))
+            return False
+        if hasattr(self, "scene") == False:
+            QMessageBox.critical(parent, _translate("calculator", "Error"), _translate("calculator", "Please select scene."))
+            return False
+        return True
     #模式1
     def mode1WindowInit(self):
         self.mode1W = mode1Window(self.configManager)
@@ -249,6 +272,9 @@ class calculator:
         self.mode1W.sceneGroup.buttonClicked.connect(lambda : self.rBtnGroupClicked("mode1"))
         self.mode1W.return_btn.clicked.connect(lambda : self.mainW.close())
         self.mode1W.help_btn.clicked.connect(lambda : webbrowser.open(Path.cwd() / "help" / "help.html"))
+
+        additional = bidict({_translate("calculator", "Normal") : 0, _translate("calculator", "Flag") : 1})
+        self.typeName.update(additional)
     def mode1Calc(self):
         try:
             uid = self.mode1W.uid_Input.value()
@@ -261,37 +287,29 @@ class calculator:
             level_ending = flags_ending // 2
 
             seed = self.mode1W.seed_Input.value()
-
-            if not flags_beginning % 2 or flags_ending % 2:
-                QMessageBox.critical(self.mode1W, "错误", "上半轮旗数为奇数，下半轮旗数为偶数！") 
+            
+            if not self.borderCheck(self.mode1W, flags_beginning, flags_ending):
                 return
-            if hasattr(self, "scene") == False:
-                QMessageBox.critical(self.mode1W, "错误", "请选择场景！")
-                return
-        except ValueError:
-            QMessageBox.critical(self.mode1W, "错误", "请按要求输入！") 
-        except SyntaxError:
-            QMessageBox.critical(self.mode1W, "错误", "请按要求输入！") 
         except:
-            QMessageBox.critical(self.mode1W, "错误", "出现意外的异常！")
+            QMessageBox.critical(self.mode1W, _translate("calculator", "Error"), _translate("calculator", "Unexpected exceptions happened!"))
         else:
             try:
                 self.result = ""
                 for lvl in range(level_beginning, level_ending):
                     zombies = seedFinder.appear(uid, mode, self.scene, lvl, seed)
-                    self.result += f"{lvl * 2 + 1}旗到{lvl * 2 + 2}旗的出怪为："
+                    self.result += "{} {} {} {}".format(lvl * 2 + 1, _translate("calculator", "to"), lvl * 2 + 2, _translate("calculator", "flags spawn zombies:"))
                     amount = 0
                     for i in range(len(zombies)):
                         if zombies[i]:
                             amount += 1
                             self.result += self.typeName.inverse[i] + " "
-                    self.result += f"共{amount}种\n\n"
+                    self.result += "{} {} {}\n\n".format(_translate("calculator", "Total"), amount, _translate("calculator", "zombies"))
                 self.msgWindowInit()
                 self.store.msgUpdate.emit(self.result)
-                self.store.titleUpdate.emit("计算完成")
+                self.store.titleUpdate.emit(_translate("calculator", "Calculation completed."))
                 self.store.alert.emit()
             except:
-                QMessageBox.critical(self.mode1W, "错误", "出现意外的异常！")
+                QMessageBox.critical(self.mode1W, _translate("calculator", "Error"), _translate("calculator", "Unexpected exceptions happened!"))
 
     #模式2
     def mode2WindowInit(self):
@@ -302,10 +320,17 @@ class calculator:
         self.mode2W.return_btn.clicked.connect(lambda : self.mainW.close())
         self.mode2W.help_btn.clicked.connect(lambda : webbrowser.open(Path.cwd() / "help" / "help.html"))
         self.mode2W.sceneGroup.buttonClicked.connect(lambda : self.rBtnGroupClicked("mode2"))
+        self.typeName = bidict()
+
         for box in self.mode2W.needGroup.findChildren(QCheckBox):
             box.stateChanged.connect(self.nCheckBoxClicked)
         for box in self.mode2W.refuseGroup.findChildren(QCheckBox):
             box.stateChanged.connect(self.rCheckBoxClicked)
+        for box in self.mode2W.needGroup.findChildren(QCheckBox):
+            id = int(box.objectName()[8:])
+            text = box.text()
+            self.typeName.put(key=text, val=id)
+        
         self.idNeeded = set()
         self.idRefused = set()
         self.wave = []
@@ -317,14 +342,14 @@ class calculator:
             seed = self.mode2W.seed_Input.value()
 
             if not self.wave:
-                QMessageBox.critical(self.mode2W, "错误", "请至少添加一条条件！")
+                QMessageBox.critical(self.mode2W, _translate("calculator", "Error"), _translate("calculator", "At least one requirement."))
                 return
 
             waveBeginning = sorted([i.level_beginning for i in self.wave])
             waveEnding = sorted([i.level_ending for i in self.wave])
             for i in range(1, len(waveBeginning)):
                 if waveBeginning[i] < waveEnding[i - 1]:
-                    QMessageBox.critical(self.mode2W, "错误", "请检查输入条件的波数区间有重叠！")
+                    QMessageBox.critical(self.mode2W, _translate("calculator", "Error"), _translate("calculator", "Please check the entered sections have overlapping borders."))
                     return
             
             self.wave.sort(key=lambda x : x.level_ending)
@@ -336,13 +361,8 @@ class calculator:
                 for i in range(eachWave.level_beginning - 1, eachWave.level_ending - 1):
                     idNeeded[i] = eachWave.idNeeded
                     idRefused[i] = eachWave.idRefused
-
-        except ValueError:
-            QMessageBox.critical(self.mode2W, "错误", "请按要求输入！") 
-        except SyntaxError:
-            QMessageBox.critical(self.mode2W, "错误", "请按要求输入！") 
         except:
-            QMessageBox.critical(self.mode2W, "错误", "出现意外的异常！")
+            QMessageBox.critical(self.mode2W, _translate("calculator", "Error"), _translate("calculator", "Unexpected exceptions happened!"))
         else:
             self.finder = seedFinder.requestToSeed(uid, mode, self.scene, self.wave[0].level_beginning, self.wave[-1].level_ending, seed)
             self.thdList = (threading.Thread(target=self.mode2CalcThread, args=(idNeeded, idRefused)), 
@@ -359,17 +379,19 @@ class calculator:
                 lastSeed = self.finder.seed
                 time.sleep(self.logInterval)
                 leftTime = self.logInterval * (0x7FFFFFFF - self.finder.seed) / (self.finder.seed - lastSeed) / 60
-                self.store.msgUpdate.emit(f"正在计算，请稍候……\n当前已检索至种子0x{self.finder.seed:x}\n进度为{self.finder.seed / 0x7FFFFFFF * 100 : .2f}% 剩余时间为{leftTime : .2f}mins")
-                self.store.titleUpdate.emit(f"正在计算中... 当前进度为{self.finder.seed / 0x7FFFFFFF * 100 : .2f}%")
+                self.store.msgUpdate.emit("{}\n{}{:#x}\n{}{:.2%} {}{:.2f}mins".format(
+                    _translate("calculator", "Calculating... Please wait."), _translate("calculator", "Current seachered seed is "), self.finder.seed, _translate("calculator", "Processing:"),
+                    self.finder.seed / 0x7FFFFFFF, _translate("calculator", "Remainning time:"), leftTime))
+                self.store.titleUpdate.emit("{}{:.2%}".format(_translate("calculator", "Calculating... Processing:"), self.finder.seed / 0x7FFFFFFF))
             except ZeroDivisionError:
-                self.store.titleUpdate.emit("计算完成")
+                self.store.titleUpdate.emit(_translate("calculator", "Calculation completed."))
         if self.finder.seed >= 0:
-            self.store.msgUpdate.emit(f"出怪满足要求的种子为：0x{self.result:x}")
-            self.store.titleUpdate.emit("计算完成")
+            self.store.msgUpdate.emit("{}{:#x}".format(_translate("calculator", "Found satisfying seed:"), self.result))
+            self.store.titleUpdate.emit(_translate("calculator", "Calculation completed."))
         else:
             self.finder.stopThread = True
-            self.store.msgUpdate.emit("没有找到满足条件的种子！")
-            self.store.titleUpdate.emit("没有找到满足条件的种子！")
+            self.store.msgUpdate.emit(_translate("calculator", "No satisfying seed found."))
+            self.store.titleUpdate.emit(_translate("calculator", "No satisfying seed found."))
         if not self.finder.stopThread:
             self.store.alert.emit()
     def joinTable(self):
@@ -378,24 +400,14 @@ class calculator:
         level_beginning = (flags_beginning - 1) // 2
         level_ending = flags_ending // 2
 
-        if hasattr(self, "scene") == False:
-            QMessageBox.critical(self.mode2W, "错误", "请选择场景！")
+        if not self.borderCheck(self.mode2W, flags_beginning, flags_ending):
             return
         for i in self.idNeeded:
             if i in self.idRefused:
-                QMessageBox.critical(self.mode2W, "错误", "需要与不需要的种类有冲突！")
+                QMessageBox.critical(self.mode2W, _translate("calculator", "Error"), _translate("calculator", "Requirements conflicts with exceptions."))
                 return
-        if not flags_beginning % 2 or flags_ending % 2:
-            QMessageBox.critical(self.mode2W, "错误", "上半轮旗数为奇数，下半轮旗数为偶数！")
-            return
-        if len(self.idNeeded) > 11:
-            QMessageBox.critical(self.mode2W, "错误", "需求僵尸过多！")
-            return
-        if len(self.idRefused) > 10:
-            QMessageBox.critical(self.mode2W, "错误", "不想要的僵尸过多！")
-            return
         if 2 in self.idRefused and 5 in self.idRefused:
-            QMessageBox.critical(self.mode2W, "错误", "路障报纸必出其一！")
+            QMessageBox.critical(self.mode2W, _translate("calculator", "Error"), _translate("calculator", "Either conehead or newspaper should spawn."))
             return
 
         idNeededShow = [self.typeName.inverse[i] for i in self.idNeeded]
@@ -463,11 +475,11 @@ class calculator:
         if self.mainW.tabWidget.currentIndex():
             if self.calcDone and self.finder.seed >= 0:
                 pyperclip.copy(f"{self.result:x}")
-                QMessageBox.information(self.mode2W, "成功", f"种子 {self.result:x} 已复制！")
+                QMessageBox.information(self.mode2W, _translate("calculator", "Successfully"), "{}{:#x}{}".format(_translate("calculator", "Seed: "), self.result, _translate("calculator", " has copied.")))
                 self.msgExit()
         else:
             pyperclip.copy(self.result)
-            QMessageBox.information(self.mode1W, "成功", "出怪类型已复制！")
+            QMessageBox.information(self.mode1W, _translate("calculator", "Successfully"), _translate("calculator", "Spawn zombies have copied."))
             self.msgExit()
 
     #种子修改窗口

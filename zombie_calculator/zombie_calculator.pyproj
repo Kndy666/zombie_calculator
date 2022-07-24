@@ -26,7 +26,6 @@
     </Compile>
     <Compile Include="gui\introduction.py" />
     <Compile Include="gui\main.py" />
-    <Compile Include="gui\main2.py" />
     <Compile Include="gui\mode1.py" />
     <Compile Include="gui\mode2.py" />
     <Compile Include="gui\modify.py" />

@@ -32,7 +32,10 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>模式2</string>
+   <string>Mode2</string>
+  </property>
+  <property name="locale">
+   <locale language="English" country="UnitedStates"/>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_11">
    <item>
@@ -72,7 +75,7 @@
                 <item>
                  <widget class="QLabel" name="uid">
                   <property name="text">
-                   <string>用户编号(uid)：</string>
+                   <string>Uid:</string>
                   </property>
                  </widget>
                 </item>
@@ -105,7 +108,7 @@
                 <item>
                  <widget class="QLabel" name="mode">
                   <property name="text">
-                   <string>存档编号(mode)：</string>
+                   <string>Mode:</string>
                   </property>
                  </widget>
                 </item>
@@ -129,7 +132,7 @@
                 <item>
                  <widget class="QLabel" name="seed">
                   <property name="text">
-                   <string>请输入起始出怪种子（选填）:</string>
+                   <string>InitialSeed:</string>
                   </property>
                  </widget>
                 </item>
@@ -171,7 +174,7 @@
                 <item>
                  <widget class="QLabel" name="startFlag">
                   <property name="text">
-                   <string>起始轮上半轮旗数：</string>
+                   <string>StartingFlag:</string>
                   </property>
                  </widget>
                 </item>
@@ -195,7 +198,7 @@
                 <item>
                  <widget class="QLabel" name="endFlag">
                   <property name="text">
-                   <string>终止轮下半轮旗数：</string>
+                   <string>EndingFlag:</string>
                   </property>
                  </widget>
                 </item>
@@ -222,7 +225,7 @@
          <item>
           <widget class="QGroupBox" name="needGroup">
            <property name="title">
-            <string>请选择希望的出怪：</string>
+            <string>RequireZombies:</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
@@ -244,135 +247,135 @@
              <number>0</number>
             </property>
             <item row="2" column="1">
-             <widget class="QCheckBox" name="need_btn12">
+             <widget class="QCheckBox" name="need_btn16">
               <property name="text">
-               <string>气球</string>
+               <string>Balloon</string>
               </property>
              </widget>
             </item>
             <item row="0" column="4">
-             <widget class="QCheckBox" name="need_btn5">
+             <widget class="QCheckBox" name="need_btn6">
               <property name="text">
-               <string>铁门</string>
+               <string>ScreenDoor</string>
               </property>
              </widget>
             </item>
             <item row="2" column="3">
-             <widget class="QCheckBox" name="need_btn14">
+             <widget class="QCheckBox" name="need_btn18">
               <property name="text">
-               <string>跳跳</string>
+               <string>Pogo</string>
               </property>
              </widget>
             </item>
             <item row="2" column="0">
-             <widget class="QCheckBox" name="need_btn11">
+             <widget class="QCheckBox" name="need_btn15">
               <property name="text">
-               <string>小丑</string>
+               <string>jackInBox</string>
               </property>
              </widget>
             </item>
             <item row="1" column="3">
-             <widget class="QCheckBox" name="need_btn9">
+             <widget class="QCheckBox" name="need_btn12">
               <property name="text">
-               <string>冰车</string>
+               <string>Zomboni</string>
               </property>
              </widget>
             </item>
             <item row="3" column="0">
-             <widget class="QCheckBox" name="need_btn16">
+             <widget class="QCheckBox" name="need_btn21">
               <property name="text">
-               <string>扶梯</string>
+               <string>Ladder</string>
               </property>
              </widget>
             </item>
             <item row="1" column="0">
-             <widget class="QCheckBox" name="need_btn6">
+             <widget class="QCheckBox" name="need_btn7">
               <property name="text">
-               <string>橄榄</string>
+               <string>Football</string>
               </property>
              </widget>
             </item>
             <item row="2" column="4">
-             <widget class="QCheckBox" name="need_btn15">
+             <widget class="QCheckBox" name="need_btn20">
               <property name="text">
-               <string>蹦极</string>
+               <string>Bungee</string>
               </property>
              </widget>
             </item>
             <item row="3" column="2">
-             <widget class="QCheckBox" name="need_btn18">
+             <widget class="QCheckBox" name="need_btn23">
               <property name="text">
-               <string>白眼</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="3">
-             <widget class="QCheckBox" name="need_btn19">
-              <property name="text">
-               <string>红眼</string>
+               <string>Gargantuar</string>
               </property>
              </widget>
             </item>
             <item row="0" column="0">
-             <widget class="QCheckBox" name="need_btn1">
+             <widget class="QCheckBox" name="need_btn2">
               <property name="text">
-               <string>路障</string>
+               <string>Conehead</string>
               </property>
              </widget>
             </item>
             <item row="0" column="3">
-             <widget class="QCheckBox" name="need_btn4">
+             <widget class="QCheckBox" name="need_btn5">
               <property name="text">
-               <string>读报</string>
+               <string>Newspaper</string>
               </property>
              </widget>
             </item>
             <item row="1" column="2">
-             <widget class="QCheckBox" name="need_btn8">
+             <widget class="QCheckBox" name="need_btn11">
               <property name="text">
-               <string>潜水</string>
+               <string>Snorkel</string>
               </property>
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="QCheckBox" name="need_btn2">
+             <widget class="QCheckBox" name="need_btn3">
               <property name="text">
-               <string>撑杆</string>
+               <string>PoleVaulting</string>
               </property>
              </widget>
             </item>
             <item row="2" column="2">
-             <widget class="QCheckBox" name="need_btn13">
+             <widget class="QCheckBox" name="need_btn17">
               <property name="text">
-               <string>矿工</string>
+               <string>Digger</string>
               </property>
              </widget>
             </item>
             <item row="1" column="4">
-             <widget class="QCheckBox" name="need_btn10">
+             <widget class="QCheckBox" name="need_btn14">
               <property name="text">
-               <string>海豚</string>
+               <string>Dolphin</string>
               </property>
              </widget>
             </item>
             <item row="3" column="1">
-             <widget class="QCheckBox" name="need_btn17">
+             <widget class="QCheckBox" name="need_btn22">
               <property name="text">
-               <string>投篮</string>
+               <string>Catapult</string>
               </property>
              </widget>
             </item>
             <item row="1" column="1">
-             <widget class="QCheckBox" name="need_btn7">
+             <widget class="QCheckBox" name="need_btn8">
               <property name="text">
-               <string>舞王</string>
+               <string>Dancing</string>
               </property>
              </widget>
             </item>
             <item row="0" column="2">
-             <widget class="QCheckBox" name="need_btn3">
+             <widget class="QCheckBox" name="need_btn4">
               <property name="text">
-               <string>铁桶</string>
+               <string>Buckethead</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="3" colspan="2">
+             <widget class="QCheckBox" name="need_btn32">
+              <property name="text">
+               <string>GigaGargantuar</string>
               </property>
              </widget>
             </item>
@@ -392,7 +395,7 @@
             </sizepolicy>
            </property>
            <property name="title">
-            <string>请选择游戏场景(scene)：</string>
+            <string>Select Scene:</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
@@ -402,9 +405,9 @@
              <number>12</number>
             </property>
             <item>
-             <widget class="QRadioButton" name="day_rBtn">
+             <widget class="QRadioButton" name="DAY_rBtn">
               <property name="text">
-               <string>DE(白天无尽,Day Endless)</string>
+               <string>Day Endless</string>
               </property>
               <attribute name="buttonGroup">
                <string notr="true">sceneGroup</string>
@@ -412,9 +415,9 @@
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="night_rBtn">
+             <widget class="QRadioButton" name="NIGHT_rBtn">
               <property name="text">
-               <string>NE(夜晚无尽,Night Endless)</string>
+               <string>Night Endless</string>
               </property>
               <attribute name="buttonGroup">
                <string notr="true">sceneGroup</string>
@@ -422,9 +425,9 @@
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="pool_rBtn">
+             <widget class="QRadioButton" name="POOL_rBtn">
               <property name="text">
-               <string>PE(泳池无尽,Pool Endless)</string>
+               <string>Pool Endless</string>
               </property>
               <attribute name="buttonGroup">
                <string notr="true">sceneGroup</string>
@@ -432,9 +435,9 @@
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="fog_rBtn">
+             <widget class="QRadioButton" name="FOG_rBtn">
               <property name="text">
-               <string>FE(雾夜无尽,Fog Endless)</string>
+               <string>Fog Endless</string>
               </property>
               <attribute name="buttonGroup">
                <string notr="true">sceneGroup</string>
@@ -442,9 +445,9 @@
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="roof_rBtn">
+             <widget class="QRadioButton" name="ROOF_rBtn">
               <property name="text">
-               <string>RE(屋顶无尽,Roof Endless)</string>
+               <string>Roof Endless</string>
               </property>
               <attribute name="buttonGroup">
                <string notr="true">sceneGroup</string>
@@ -452,9 +455,9 @@
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="moon_rBtn">
+             <widget class="QRadioButton" name="MOON_rBtn">
               <property name="text">
-               <string>ME(月夜无尽,Moon Endless)</string>
+               <string>Moon Endless</string>
               </property>
               <attribute name="buttonGroup">
                <string notr="true">sceneGroup</string>
@@ -462,9 +465,9 @@
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="mushroom_rBtn">
+             <widget class="QRadioButton" name="MG_rBtn">
               <property name="text">
-               <string>MGE(蘑菇园无尽,Mushroom Garden Endless)</string>
+               <string>Mushroom Garden Endless</string>
               </property>
               <attribute name="buttonGroup">
                <string notr="true">sceneGroup</string>
@@ -472,9 +475,9 @@
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="aquarium_rBtn">
+             <widget class="QRadioButton" name="AQ_rBtn">
               <property name="text">
-               <string>AQE(水族馆无尽,Aquarium Endless)</string>
+               <string>Aquarium Endless</string>
               </property>
               <attribute name="buttonGroup">
                <string notr="true">sceneGroup</string>
@@ -493,7 +496,7 @@
             </sizepolicy>
            </property>
            <property name="title">
-            <string>请选择不希望的出怪：</string>
+            <string>ExceptZombies:</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
@@ -526,133 +529,133 @@
             <item row="0" column="1">
              <widget class="QCheckBox" name="refuse_btn2">
               <property name="text">
-               <string>撑杆</string>
+               <string>PoleVaulting</string>
               </property>
              </widget>
             </item>
             <item row="2" column="0">
              <widget class="QCheckBox" name="refuse_btn11">
               <property name="text">
-               <string>小丑</string>
+               <string>jackInBox</string>
               </property>
              </widget>
             </item>
             <item row="3" column="0">
              <widget class="QCheckBox" name="refuse_btn16">
               <property name="text">
-               <string>扶梯</string>
+               <string>Ladder</string>
               </property>
              </widget>
             </item>
             <item row="1" column="4">
              <widget class="QCheckBox" name="refuse_btn10">
               <property name="text">
-               <string>海豚</string>
+               <string>Dolphin</string>
               </property>
              </widget>
             </item>
             <item row="0" column="4">
              <widget class="QCheckBox" name="refuse_btn5">
               <property name="text">
-               <string>铁门</string>
+               <string>ScreenDoor</string>
               </property>
              </widget>
             </item>
             <item row="0" column="3">
              <widget class="QCheckBox" name="refuse_btn4">
               <property name="text">
-               <string>读报</string>
+               <string>Newspaper</string>
               </property>
              </widget>
             </item>
             <item row="0" column="0">
              <widget class="QCheckBox" name="refuse_btn1">
               <property name="text">
-               <string>路障</string>
+               <string>Conehead</string>
               </property>
              </widget>
             </item>
             <item row="0" column="2">
              <widget class="QCheckBox" name="refuse_btn3">
               <property name="text">
-               <string>铁桶</string>
+               <string>Buckethead</string>
               </property>
              </widget>
             </item>
             <item row="3" column="1">
              <widget class="QCheckBox" name="refuse_btn17">
               <property name="text">
-               <string>投篮</string>
+               <string>Catapult</string>
               </property>
              </widget>
             </item>
             <item row="1" column="1">
              <widget class="QCheckBox" name="refuse_btn7">
               <property name="text">
-               <string>舞王</string>
+               <string>Dancing</string>
               </property>
              </widget>
             </item>
             <item row="1" column="2">
              <widget class="QCheckBox" name="refuse_btn8">
               <property name="text">
-               <string>潜水</string>
+               <string>Snorkel</string>
               </property>
              </widget>
             </item>
             <item row="2" column="4">
              <widget class="QCheckBox" name="refuse_btn15">
               <property name="text">
-               <string>蹦极</string>
+               <string>Bungee</string>
               </property>
              </widget>
             </item>
             <item row="3" column="2">
              <widget class="QCheckBox" name="refuse_btn18">
               <property name="text">
-               <string>白眼</string>
+               <string>Gargantuar</string>
               </property>
              </widget>
             </item>
             <item row="2" column="3">
              <widget class="QCheckBox" name="refuse_btn14">
               <property name="text">
-               <string>跳跳</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="3">
-             <widget class="QCheckBox" name="refuse_btn19">
-              <property name="text">
-               <string>红眼</string>
+               <string>Pogo</string>
               </property>
              </widget>
             </item>
             <item row="1" column="3">
              <widget class="QCheckBox" name="refuse_btn9">
               <property name="text">
-               <string>冰车</string>
+               <string>Zomboni</string>
               </property>
              </widget>
             </item>
             <item row="1" column="0">
              <widget class="QCheckBox" name="refuse_btn6">
               <property name="text">
-               <string>橄榄</string>
+               <string>Football</string>
               </property>
              </widget>
             </item>
             <item row="2" column="2">
              <widget class="QCheckBox" name="refuse_btn13">
               <property name="text">
-               <string>矿工</string>
+               <string>Digger</string>
               </property>
              </widget>
             </item>
             <item row="2" column="1">
              <widget class="QCheckBox" name="refuse_btn12">
               <property name="text">
-               <string>气球</string>
+               <string>Balloon</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="3" colspan="2">
+             <widget class="QCheckBox" name="refuse_btn19">
+              <property name="text">
+               <string>GigaGargantuar</string>
               </property>
              </widget>
             </item>
@@ -697,7 +700,7 @@
             </size>
            </property>
            <property name="text">
-            <string>获取帮助</string>
+            <string>Help</string>
            </property>
           </widget>
          </item>
@@ -732,7 +735,7 @@
             </size>
            </property>
            <property name="text">
-            <string>运行计算</string>
+            <string>Calculate</string>
            </property>
           </widget>
          </item>
@@ -757,7 +760,7 @@
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
              <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
+             <verstretch>2</verstretch>
             </sizepolicy>
            </property>
            <property name="minimumSize">
@@ -767,7 +770,7 @@
             </size>
            </property>
            <property name="text">
-            <string>返回主界面</string>
+            <string>Back</string>
            </property>
           </widget>
          </item>
@@ -821,7 +824,7 @@
          </attribute>
          <column>
           <property name="text">
-           <string>波数</string>
+           <string>Wave</string>
           </property>
           <property name="font">
            <font>
@@ -835,7 +838,7 @@
          </column>
          <column>
           <property name="text">
-           <string>需要类型</string>
+           <string>Require</string>
           </property>
           <property name="font">
            <font>
@@ -849,7 +852,7 @@
          </column>
          <column>
           <property name="text">
-           <string>排除类型</string>
+           <string>Except</string>
           </property>
           <property name="font">
            <font>
@@ -870,7 +873,7 @@
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
              <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
+             <verstretch>2</verstretch>
             </sizepolicy>
            </property>
            <property name="minimumSize">
@@ -880,7 +883,7 @@
             </size>
            </property>
            <property name="text">
-            <string>加入</string>
+            <string>Join</string>
            </property>
           </widget>
          </item>
@@ -905,7 +908,7 @@
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
              <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
+             <verstretch>2</verstretch>
             </sizepolicy>
            </property>
            <property name="minimumSize">
@@ -915,7 +918,7 @@
             </size>
            </property>
            <property name="text">
-            <string>删除</string>
+            <string>Delete</string>
            </property>
           </widget>
          </item>

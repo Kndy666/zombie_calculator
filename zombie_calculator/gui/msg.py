@@ -16,6 +16,7 @@ class Ui_msgWindow(object):
         msgWindow.setObjectName("msgWindow")
         msgWindow.setWindowModality(QtCore.Qt.ApplicationModal)
         msgWindow.resize(231, 134)
+        msgWindow.setLocale(QtCore.QLocale(QtCore.QLocale.English, QtCore.QLocale.UnitedStates))
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(msgWindow)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.verticalLayout = QtWidgets.QVBoxLayout()
@@ -64,6 +65,6 @@ class Ui_msgWindow(object):
 
     def retranslateUi(self, msgWindow):
         _translate = QtCore.QCoreApplication.translate
-        msgWindow.setWindowTitle(_translate("msgWindow", "正在计算中..."))
-        self.return_btn.setText(_translate("msgWindow", "返回"))
-        self.copy_btn.setText(_translate("msgWindow", "复制"))
+        msgWindow.setWindowTitle(_translate("msgWindow", "Calculating"))
+        self.return_btn.setText(_translate("msgWindow", "Back"))
+        self.copy_btn.setText(_translate("msgWindow", "Copy"))

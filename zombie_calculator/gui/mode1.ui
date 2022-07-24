@@ -26,7 +26,10 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>模式1</string>
+   <string>mode1</string>
+  </property>
+  <property name="locale">
+   <locale language="English" country="UnitedStates"/>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_7">
    <item>
@@ -64,7 +67,7 @@
               <item>
                <widget class="QLabel" name="uid">
                 <property name="text">
-                 <string>用户编号(uid)：</string>
+                 <string>Uid:</string>
                 </property>
                </widget>
               </item>
@@ -97,7 +100,7 @@
               <item>
                <widget class="QLabel" name="mode">
                 <property name="text">
-                 <string>存档编号(mode)：</string>
+                 <string>Mode:</string>
                 </property>
                </widget>
               </item>
@@ -139,7 +142,7 @@
               <item>
                <widget class="QLabel" name="startFlag">
                 <property name="text">
-                 <string>起始轮上半轮旗数：</string>
+                 <string>StartingFlag:</string>
                 </property>
                </widget>
               </item>
@@ -163,7 +166,7 @@
               <item>
                <widget class="QLabel" name="endFlag">
                 <property name="text">
-                 <string>终止轮下半轮旗数：</string>
+                 <string>EndingFlag:</string>
                 </property>
                </widget>
               </item>
@@ -187,7 +190,7 @@
               <item>
                <widget class="QLabel" name="seed">
                 <property name="text">
-                 <string>请输入出怪种子:</string>
+                 <string>Seed:</string>
                 </property>
                </widget>
               </item>
@@ -220,7 +223,7 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>请选择游戏场景(scene)：</string>
+          <string>Select Scene:</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -230,9 +233,9 @@
            <number>12</number>
           </property>
           <item>
-           <widget class="QRadioButton" name="day_rBtn">
+           <widget class="QRadioButton" name="DAY_rBtn">
             <property name="text">
-             <string>DE(白天无尽,Day Endless)</string>
+             <string>Day Endless</string>
             </property>
             <attribute name="buttonGroup">
              <string notr="true">sceneGroup</string>
@@ -240,9 +243,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="night_rBtn">
+           <widget class="QRadioButton" name="NIGHT_rBtn">
             <property name="text">
-             <string>NE(夜晚无尽,Night Endless)</string>
+             <string>Night Endless</string>
             </property>
             <attribute name="buttonGroup">
              <string notr="true">sceneGroup</string>
@@ -250,9 +253,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="pool_rBtn">
+           <widget class="QRadioButton" name="POOL_rBtn">
             <property name="text">
-             <string>PE(泳池无尽,Pool Endless)</string>
+             <string>Pool Endless</string>
             </property>
             <attribute name="buttonGroup">
              <string notr="true">sceneGroup</string>
@@ -260,9 +263,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="fog_rBtn">
+           <widget class="QRadioButton" name="FOG_rBtn">
             <property name="text">
-             <string>FE(雾夜无尽,Fog Endless)</string>
+             <string>Fog Endless</string>
             </property>
             <attribute name="buttonGroup">
              <string notr="true">sceneGroup</string>
@@ -270,9 +273,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="roof_rBtn">
+           <widget class="QRadioButton" name="ROOF_rBtn">
             <property name="text">
-             <string>RE(屋顶无尽,Roof Endless)</string>
+             <string>Roof Endless</string>
             </property>
             <attribute name="buttonGroup">
              <string notr="true">sceneGroup</string>
@@ -280,9 +283,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="moon_rBtn">
+           <widget class="QRadioButton" name="MOON_rBtn">
             <property name="text">
-             <string>ME(月夜无尽,Moon Endless)</string>
+             <string>Moon Endless</string>
             </property>
             <attribute name="buttonGroup">
              <string notr="true">sceneGroup</string>
@@ -290,9 +293,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="mushroom_rBtn">
+           <widget class="QRadioButton" name="MG_rBtn">
             <property name="text">
-             <string>MGE(蘑菇园无尽,Mushroom Garden Endless)</string>
+             <string>Mushroom Garden Endless</string>
             </property>
             <attribute name="buttonGroup">
              <string notr="true">sceneGroup</string>
@@ -300,9 +303,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="aquarium_rBtn">
+           <widget class="QRadioButton" name="AQ_rBtn">
             <property name="text">
-             <string>AQE(水族馆无尽,Aquarium Endless)</string>
+             <string>Aquarium Endless</string>
             </property>
             <attribute name="buttonGroup">
              <string notr="true">sceneGroup</string>
@@ -350,7 +353,7 @@
           </size>
          </property>
          <property name="text">
-          <string>获取帮助</string>
+          <string>Help</string>
          </property>
         </widget>
        </item>
@@ -385,7 +388,7 @@
           </size>
          </property>
          <property name="text">
-          <string>运行计算</string>
+          <string>Calculate</string>
          </property>
         </widget>
        </item>
@@ -420,7 +423,7 @@
           </size>
          </property>
          <property name="text">
-          <string>返回主界面</string>
+          <string>Back</string>
          </property>
         </widget>
        </item>

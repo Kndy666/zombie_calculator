@@ -1,5 +1,5 @@
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import Qt, QCoreApplication
+from PyQt5.QtCore import Qt, QCoreApplication, QLocale
 from PyQt5.QtWidgets import QMainWindow, QTabWidget, QStyleOptionTabWidgetFrame, QStyle
 
 class TabWidget(QTabWidget):
@@ -32,6 +32,7 @@ class mainWindow(QMainWindow):
         self.setWindowIcon(QIcon("icon.ico"))
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setWindowModality(Qt.ApplicationModal)
+        self.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
         self.tabWidget = TabWidget()
         self.setCentralWidget(self.tabWidget)
         self.tabWidget.currentChanged.connect(self.updateSize)
@@ -43,4 +44,4 @@ class mainWindow(QMainWindow):
         self.adjustSize()
     def retranslateUi(self):
         _translate = QCoreApplication.translate
-        self.setWindowTitle(_translate("mainWindow", "出怪计算器"))
+        self.setWindowTitle(_translate("mainWindow", "Zombie_calculator"))

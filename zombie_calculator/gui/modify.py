@@ -18,6 +18,7 @@ class Ui_modifyWindow(object):
         modifyWindow.resize(229, 200)
         modifyWindow.setMinimumSize(QtCore.QSize(229, 200))
         modifyWindow.setMaximumSize(QtCore.QSize(229, 200))
+        modifyWindow.setLocale(QtCore.QLocale(QtCore.QLocale.English, QtCore.QLocale.UnitedStates))
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(modifyWindow)
         self.verticalLayout_3.setSpacing(20)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
@@ -84,8 +85,8 @@ class Ui_modifyWindow(object):
 
     def retranslateUi(self, modifyWindow):
         _translate = QtCore.QCoreApplication.translate
-        modifyWindow.setWindowTitle(_translate("modifyWindow", "修改种子"))
-        self.label.setText(_translate("modifyWindow", "种子："))
-        self.findGame_btn.setText(_translate("modifyWindow", "查找游戏"))
-        self.getSeed_btn.setText(_translate("modifyWindow", "获取当前种子"))
-        self.modifySeed_btn.setText(_translate("modifyWindow", "修改种子"))
+        modifyWindow.setWindowTitle(_translate("modifyWindow", "ModifySeed"))
+        self.label.setText(_translate("modifyWindow", "Seed:"))
+        self.findGame_btn.setText(_translate("modifyWindow", "Search Game"))
+        self.getSeed_btn.setText(_translate("modifyWindow", "Acquire Current Seed"))
+        self.modifySeed_btn.setText(_translate("modifyWindow", "Modify Seed"))
