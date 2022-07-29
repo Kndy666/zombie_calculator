@@ -1,9 +1,13 @@
 from PyQt5.QtGui import QIcon, QGuiApplication
 from PyQt5.QtCore import pyqtSignal as Signal, QObject, Qt, QCoreApplication, QTranslator, QEvent, QLocale
 from PyQt5.QtWidgets import QApplication, QMessageBox, QMainWindow, QWidget, QCheckBox, QDialog, QHeaderView, QTableWidgetItem, QStatusBar, QGraphicsOpacityEffect, QLabel, QActionGroup, QAction
+from PyQt5.QtWinExtras import QWinTaskbarButton
 from qt_material import apply_stylesheet, QtStyleTools
 
 from bidict import bidict
+from dataclasses import dataclass
+from enum import Enum, unique
+from typing import List
 from pathlib import Path
 import sys
 import time
@@ -157,21 +161,25 @@ class modifyWindow(QWidget, Ui_modifyWindow):
             self.statusLabel.setText(f"<font color=\"{color}\" style=\"font-style: italic;\">{info}</font>")
             return False
 
-class signalStore(QObject):
-    msgUpdate = Signal(str)
-    titleUpdate = Signal(str)
-    alert = Signal()
-
-class waveRequire:
-    def __init__(self, level_beginning, level_ending, idNeeded, idRefused):
-        self.level_beginning = level_beginning
-        self.level_ending = level_ending
-        self.idNeeded = idNeeded
-        self.idRefused = idRefused
-    def __eq__(self, other):
-        return self.level_beginning == other.level_beginning and self.level_ending == other.level_ending and self.idNeeded == other.idNeeded and self.idRefused == other.idRefused
-
 class calculator:
+    class signalStore(QObject):
+        msgUpdate = Signal(str)
+        titleUpdate = Signal(str)
+        processUpdate = Signal(int)
+        alert = Signal()
+
+    @dataclass
+    class waveRequire:
+        level_beginning : int
+        level_ending : int
+        idNeeded : List[int]
+        idRefused : List[int]
+
+    @unique
+    class taskBarUpdateSignal(Enum):
+        init = -1
+        stop = -2
+
     #工具方法&初始化
     def __init__(self):
         self.configManager = Config()
@@ -190,9 +198,10 @@ class calculator:
             self.trans.load("language\\zh_CN.qm")
         self.app.installTranslator(self.trans)
 
-        self.store = signalStore()
+        self.store = self.signalStore()
         self.store.msgUpdate.connect(self.msgUpdate)
         self.store.titleUpdate.connect(self.titleUpdate)
+        self.store.processUpdate.connect(self.updateTaskBar)
         self.store.alert.connect(self.completeAlert)
         self.introWindowInit()
 
@@ -240,7 +249,7 @@ class calculator:
 
         self.introW.start_btn.clicked.connect(self.showMainWindow)
         self.introW.inject_btn.clicked.connect(self.modifyWindowInit)
-        self.introW.exit_btn.clicked.connect(lambda : self.app.quit())
+        self.introW.exit_btn.clicked.connect(self.app.quit)
         self.introW.help_btn.clicked.connect(lambda : webbrowser.open(Path.cwd() / "help" / "help.html"))
         for action in self.introW.menuLanguage.actions():
             action.triggered.connect(self.changeLanguage)
@@ -270,7 +279,7 @@ class calculator:
         self.mode1W = mode1Window(self.configManager)
         self.mode1W.calc_btn.clicked.connect(self.mode1Calc)
         self.mode1W.sceneGroup.buttonClicked.connect(lambda : self.rBtnGroupClicked("mode1"))
-        self.mode1W.return_btn.clicked.connect(lambda : self.mainW.close())
+        self.mode1W.return_btn.clicked.connect(self.mainW.close)
         self.mode1W.help_btn.clicked.connect(lambda : webbrowser.open(Path.cwd() / "help" / "help.html"))
 
         additional = bidict({_translate("calculator", "Normal") : 0, _translate("calculator", "Flag") : 1})
@@ -317,7 +326,7 @@ class calculator:
         self.mode2W.calc_btn.clicked.connect(self.mode2Calc)
         self.mode2W.join_btn.clicked.connect(self.joinTable)
         self.mode2W.del_btn.clicked.connect(self.delTable)
-        self.mode2W.return_btn.clicked.connect(lambda : self.mainW.close())
+        self.mode2W.return_btn.clicked.connect(self.mainW.close)
         self.mode2W.help_btn.clicked.connect(lambda : webbrowser.open(Path.cwd() / "help" / "help.html"))
         self.mode2W.sceneGroup.buttonClicked.connect(lambda : self.rBtnGroupClicked("mode2"))
         self.typeName = bidict()
@@ -331,6 +340,11 @@ class calculator:
             text = box.text()
             self.typeName.put(key=text, val=id)
         
+        self.windowsTaskbarButton = QWinTaskbarButton()
+        self.windowsTaskbarButton.setWindow(self.introW.windowHandle())
+        self.windowsTaskbarProcess = self.windowsTaskbarButton.progress()
+        self.windowsTaskbarProcess.setRange(0, 10000)
+
         self.idNeeded = set()
         self.idRefused = set()
         self.wave = []
@@ -374,17 +388,20 @@ class calculator:
         self.result = self.finder.calc(idNeeded, idRefused)
         self.calcDone = True
     def seedLogger(self):
+        self.store.processUpdate.emit(self.taskBarUpdateSignal.init.value)
         while self.calcDone == False and self.finder.seed >= 0:
             try:
                 lastSeed = self.finder.seed
                 time.sleep(self.logInterval)
-                leftTime = self.logInterval * (0x7FFFFFFF - self.finder.seed) / (self.finder.seed - lastSeed) / 60
+                remainTime = self.logInterval * (0x7FFFFFFF - self.finder.seed) / (self.finder.seed - lastSeed) / 60
                 self.store.msgUpdate.emit("{}\n{}{:#x}\n{}{:.2%} {}{:.2f}mins".format(
                     _translate("calculator", "Calculating... Please wait."), _translate("calculator", "Current seachered seed is "), self.finder.seed, _translate("calculator", "Processing:"),
-                    self.finder.seed / 0x7FFFFFFF, _translate("calculator", "Remainning time:"), leftTime))
+                    self.finder.seed / 0x7FFFFFFF, _translate("calculator", "Remainning time:"), remainTime))
                 self.store.titleUpdate.emit("{}{:.2%}".format(_translate("calculator", "Calculating... Processing:"), self.finder.seed / 0x7FFFFFFF))
+                self.store.processUpdate.emit(int(self.finder.seed / 0x7FFFFFFF * 10000))
             except ZeroDivisionError:
                 self.store.titleUpdate.emit(_translate("calculator", "Calculation completed."))
+                self.store.processUpdate.emit(self.taskBarUpdateSignal.stop.value)
         if self.finder.seed >= 0:
             self.store.msgUpdate.emit("{}{:#x}".format(_translate("calculator", "Found satisfying seed:"), self.result))
             self.store.titleUpdate.emit(_translate("calculator", "Calculation completed."))
@@ -394,6 +411,14 @@ class calculator:
             self.store.titleUpdate.emit(_translate("calculator", "No satisfying seed found."))
         if not self.finder.stopThread:
             self.store.alert.emit()
+    def updateTaskBar(self, process):
+        if process == self.taskBarUpdateSignal.stop.value:
+            self.windowsTaskbarProcess.setValue(0)
+            self.windowsTaskbarProcess.setVisible(False)
+        elif process == self.taskBarUpdateSignal.init.value:
+            self.windowsTaskbarProcess.show()
+        else:
+            self.windowsTaskbarProcess.setValue(process)            
     def joinTable(self):
         flags_beginning = self.mode2W.startFlag_Input.value()
         flags_ending = self.mode2W.endFlag_Input.value()
@@ -415,7 +440,7 @@ class calculator:
     
         waveShow = ((flags_beginning, flags_ending), idNeededShow, idRefusedShow)
 
-        waveInstance = waveRequire(level_beginning, level_ending, list(self.idNeeded), list(self.idRefused))
+        waveInstance = self.waveRequire(level_beginning, level_ending, list(self.idNeeded), list(self.idRefused))
         if self.wave.count(waveInstance):
             return
         self.wave.append(waveInstance)
@@ -440,7 +465,7 @@ class calculator:
             idRefused = eval(self.mode2W.waveTable.item(row, 2).text())
             idNeeded = list(map(lambda x : self.typeName[x], idNeeded))
             idRefused = list(map(lambda x : self.typeName[x], idRefused))
-            waveInstance = waveRequire(level_beginning, level_ending, idNeeded, idRefused)
+            waveInstance = self.waveRequire(level_beginning, level_ending, idNeeded, idRefused)
             self.wave.remove(waveInstance)
             if not self.wave:
                 self.mode2W.uidGroupBox.setEnabled(True)
@@ -467,6 +492,7 @@ class calculator:
     def msgExit(self):
         if self.mainW.tabWidget.currentIndex():
             self.finder.stopThread = True
+            self.store.processUpdate.emit(self.taskBarUpdateSignal.stop.value)
             isExit = False
             while isExit == False:
                 isExit = not(self.thdList[0].is_alive()) and not(self.thdList[1].is_alive())
