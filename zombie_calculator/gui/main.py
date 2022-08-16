@@ -26,10 +26,9 @@ class TabWidget(QTabWidget):
     def sizeHint(self):
         return self.minimumSizeHint()
 
-class mainWindow(QMainWindow):
+class Ui_mainWindow(QMainWindow):
     def __init__(self, parent=None):
-        super(mainWindow, self).__init__(parent)
-        self.setWindowIcon(QIcon("icon.ico"))
+        super(Ui_mainWindow, self).__init__(parent)
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setWindowModality(Qt.ApplicationModal)
         self.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))

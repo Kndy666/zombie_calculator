@@ -1,0 +1,6 @@
+include zombie_calculator/*.pyd
+include zombie_calculator/gui/*.ui
+include zombie_calculator/pack_resources/icon.ico
+include zombie_calculator/pack_resources/qt_material/material.css.template
+recursive-include zombie_calculator/pack_resources/language *.*
+recursive-include zombie_calculator/pack_resources/help *.*

@@ -2,13 +2,13 @@ from PyQt5.QtGui import QIcon, QGuiApplication
 from PyQt5.QtCore import pyqtSignal as Signal, QObject, Qt, QCoreApplication, QTranslator, QEvent, QLocale
 from PyQt5.QtWidgets import QApplication, QMessageBox, QMainWindow, QWidget, QCheckBox, QDialog, QHeaderView, QTableWidgetItem, QStatusBar, QGraphicsOpacityEffect, QLabel, QActionGroup, QAction
 from PyQt5.QtWinExtras import QWinTaskbarButton
-from qt_material import apply_stylesheet, QtStyleTools
+from qt_material import build_stylesheet, QtStyleTools
 
 from bidict import bidict
 from dataclasses import dataclass
 from enum import Enum, unique
 from typing import List
-from pathlib import Path
+import os
 import sys
 import time
 import threading
@@ -18,8 +18,11 @@ import webbrowser
 import copy
 import pyperclip
 
+cwd = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(cwd)
+
 from gui.introduction import Ui_introductionWindow
-from gui.main import mainWindow
+from gui.main import Ui_mainWindow
 from gui.mode1 import Ui_mode1Window
 from gui.mode2 import Ui_mode2Window
 from gui.msg import Ui_msgWindow
@@ -29,6 +32,44 @@ from config import Config
 
 _translate = QCoreApplication.translate
 
+def apply_stylesheet(
+    app,
+    theme='',
+    style=None,
+    save_as=None,
+    invert_secondary=False,
+    extra={},
+    parent='theme',
+):
+
+    if style:
+        try:
+            try:
+                app.setStyle(style)
+            except:  # snake_case, true_property
+                app.style = style
+        except:
+            #logging.error(f"The style '{style}' does not exist.")
+            pass
+
+    if extra.get("QMenu") != True and "QMenu" in extra:
+        for k in extra['QMenu']:
+            extra[f'qmenu_{k}'] = extra['QMenu'][k]
+        extra['QMenu'] = True
+
+    stylesheet = build_stylesheet(theme, invert_secondary, extra, parent, os.path.join(cwd, "pack_resources/qt_material/material.css.template"))
+    if stylesheet is None:
+        return
+
+    if save_as:
+        with open(save_as, 'w') as file:
+            file.writelines(stylesheet)
+
+    try:
+        app.setStyleSheet(stylesheet)
+    except:
+        app.style_sheet = stylesheet
+
 class introductionWindow(QMainWindow, Ui_introductionWindow, QtStyleTools):
     def __init__(self, config, parent=None):
         super(introductionWindow, self).__init__(parent)
@@ -36,7 +77,27 @@ class introductionWindow(QMainWindow, Ui_introductionWindow, QtStyleTools):
         self.configManager = config
 
         self.setupUi(self)
-        self.setWindowIcon(QIcon("icon.ico"))
+        self.setWindowIcon(QIcon(os.path.join(cwd, "pack_resources/icon.ico")))
+    def apply_stylesheet(
+        self, parent, theme, invert_secondary=False, extra={}, callable_=None
+    ):
+        if theme == 'default':
+            try:
+                parent.setStyleSheet('')
+            except:
+                parent.style_sheet = ''
+            return
+
+        apply_stylesheet(
+            parent,
+            theme=theme,
+            invert_secondary=invert_secondary,
+            extra=extra,
+        )
+
+        if callable_:
+            callable_()
+
     def update_theme_event(self, parent):
         density = [
             action.text()
@@ -58,7 +119,7 @@ class introductionWindow(QMainWindow, Ui_introductionWindow, QtStyleTools):
         self.configManager.updateConfig(self.configManager.config)
 
         self.extra_values['density_scale'] = density
-
+        
         self.apply_stylesheet(
             parent,
             theme=theme,
@@ -90,7 +151,7 @@ class mode1Window(QWidget, Ui_mode1Window):
         self.configManager = config
 
         self.setupUi(self)
-        self.setWindowIcon(QIcon("icon.ico"))
+        self.setWindowIcon(QIcon(os.path.join(cwd, "pack_resources/icon.ico")))
         self.setAttribute(Qt.WA_DeleteOnClose)
 class mode2Window(QWidget, Ui_mode2Window):
     def __init__(self, config, parent=None):
@@ -99,7 +160,7 @@ class mode2Window(QWidget, Ui_mode2Window):
         self.configManager = config
 
         self.setupUi(self) 
-        self.setWindowIcon(QIcon("icon.ico"))
+        self.setWindowIcon(QIcon(os.path.join(cwd, "pack_resources/icon.ico")))
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.waveTable.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
         self.waveTable.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
@@ -111,7 +172,7 @@ class msgWindow(QDialog, Ui_msgWindow):
         self.configManager = config
 
         self.setupUi(self)
-        self.setWindowIcon(QIcon("icon.ico"))
+        self.setWindowIcon(QIcon(os.path.join(cwd, "pack_resources/icon.ico")))
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowMinimizeButtonHint)
 class modifyWindow(QWidget, Ui_modifyWindow):
@@ -121,7 +182,7 @@ class modifyWindow(QWidget, Ui_modifyWindow):
         self.configManager = config
 
         self.setupUi(self)
-        self.setWindowIcon(QIcon("icon.ico"))
+        self.setWindowIcon(QIcon(os.path.join(cwd, "pack_resources/icon.ico")))
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowMinimizeButtonHint | Qt.WindowCloseButtonHint)
 
@@ -160,6 +221,10 @@ class modifyWindow(QWidget, Ui_modifyWindow):
             info = _translate("calculator", "Process open error")
             self.statusLabel.setText(f"<font color=\"{color}\" style=\"font-style: italic;\">{info}</font>")
             return False
+class mainWindow(Ui_mainWindow):
+    def __init__(self):
+        super(mainWindow, self).__init__()
+        self.setWindowIcon(QIcon(os.path.join(cwd, "pack_resources/icon.ico")))
 
 class calculator:
     class signalStore(QObject):
@@ -195,7 +260,7 @@ class calculator:
         language = QLocale().language()
         self.trans = QTranslator()
         if language == QLocale.Chinese:
-            self.trans.load("language\\zh_CN.qm")
+            self.trans.load(os.path.join(cwd, "pack_resources/language/zh_CN.qm"))
         self.app.installTranslator(self.trans)
 
         self.store = self.signalStore()
@@ -210,7 +275,7 @@ class calculator:
         if language == "English":
             self.app.removeTranslator(self.trans)
         elif language == "中文":
-            self.trans.load("language\\zh_CN.qm")
+            self.trans.load(os.path.join(cwd, "pack_resources/language/zh_CN.qm"))
             self.app.installTranslator(self.trans)
 
     def start(self):
@@ -250,7 +315,7 @@ class calculator:
         self.introW.start_btn.clicked.connect(self.showMainWindow)
         self.introW.inject_btn.clicked.connect(self.modifyWindowInit)
         self.introW.exit_btn.clicked.connect(self.app.quit)
-        self.introW.help_btn.clicked.connect(lambda : webbrowser.open(Path.cwd() / "help" / "help.html"))
+        self.introW.help_btn.clicked.connect(lambda : webbrowser.open(os.path.join(cwd, "pack_resources/help/help.html")))
         for action in self.introW.menuLanguage.actions():
             action.triggered.connect(self.changeLanguage)
 
@@ -280,7 +345,7 @@ class calculator:
         self.mode1W.calc_btn.clicked.connect(self.mode1Calc)
         self.mode1W.sceneGroup.buttonClicked.connect(lambda : self.rBtnGroupClicked("mode1"))
         self.mode1W.return_btn.clicked.connect(self.mainW.close)
-        self.mode1W.help_btn.clicked.connect(lambda : webbrowser.open(Path.cwd() / "help" / "help.html"))
+        self.mode1W.help_btn.clicked.connect(lambda : webbrowser.open(os.path.join(cwd, "pack_resources/help/help.html")))
 
         additional = bidict({_translate("calculator", "Normal") : 0, _translate("calculator", "Flag") : 1})
         self.typeName.update(additional)
@@ -327,7 +392,7 @@ class calculator:
         self.mode2W.join_btn.clicked.connect(self.joinTable)
         self.mode2W.del_btn.clicked.connect(self.delTable)
         self.mode2W.return_btn.clicked.connect(self.mainW.close)
-        self.mode2W.help_btn.clicked.connect(lambda : webbrowser.open(Path.cwd() / "help" / "help.html"))
+        self.mode2W.help_btn.clicked.connect(lambda : webbrowser.open(os.path.join(cwd, "pack_resources/help/help.html")))
         self.mode2W.sceneGroup.buttonClicked.connect(lambda : self.rBtnGroupClicked("mode2"))
         self.typeName = bidict()
 

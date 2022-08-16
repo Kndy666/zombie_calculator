@@ -42,7 +42,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="gui\introduction.ui" />
-    <Content Include="gui\main.ui" />
     <Content Include="gui\mode1.ui" />
     <Content Include="gui\mode2.ui" />
     <Content Include="gui\modify.ui" />

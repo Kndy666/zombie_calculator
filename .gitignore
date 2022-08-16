@@ -370,3 +370,7 @@ FodyWeavers.xsd
 *.filters
 *.cmd
 /zombie_calculator/config.json
+/zombie_calculator.egg-info
+/build/lib
+/dist
+/pack_resources
