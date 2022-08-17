@@ -10,9 +10,14 @@ def readme():
         context = f.read()
     return context
 
+def getVersion():
+    with open("version", encoding="utf-8") as f:
+        ver = f.read()
+    return ver
+
 setup(
     name = "zombie_calculator",
-    version = "0.0.4.3",
+    version = getVersion(),
     author = "kndy666",
     author_email = "kndy_666@163.com",
     description = "A program used to calculate specific pvz spawn seed.",

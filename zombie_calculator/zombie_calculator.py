@@ -57,7 +57,7 @@ def apply_stylesheet(
             extra[f'qmenu_{k}'] = extra['QMenu'][k]
         extra['QMenu'] = True
 
-    stylesheet = build_stylesheet(theme, invert_secondary, extra, parent, os.path.join(cwd, "pack_resources/qt_material/material.css.template"))
+    stylesheet = build_stylesheet(theme, invert_secondary, extra, parent, os.path.join(cwd, "pack_resources/material.css.template"))
     if stylesheet is None:
         return
 

@@ -1,4 +1,3 @@
-from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt, QCoreApplication, QLocale
 from PyQt5.QtWidgets import QMainWindow, QTabWidget, QStyleOptionTabWidgetFrame, QStyle
 

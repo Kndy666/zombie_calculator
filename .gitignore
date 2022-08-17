@@ -374,3 +374,4 @@ FodyWeavers.xsd
 /build/lib
 /dist
 /pack_resources
+/zombie_calculator/qt_material
